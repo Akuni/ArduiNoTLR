@@ -1,0 +1,18 @@
+button 12
+led 9
+
+setup:
+    led OUTPUT
+    button INPUT
+
+loop:
+    when button is ON
+        if led is ON
+            led OFF
+        else
+            led ON
+
+
+
+
+
