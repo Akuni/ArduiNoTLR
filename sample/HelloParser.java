@@ -21,12 +21,12 @@ public class HelloParser extends Parser {
 		ON=19, OFF=20, INPUT=21, OUTPUT=22, ID=23, INT=24, DEC=25, WS=26;
 	public static final int
 		RULE_r = 0, RULE_setup = 1, RULE_loop = 2, RULE_set = 3, RULE_sets = 4, 
-		RULE_actions = 5, RULE_action = 6, RULE_affect = 7, RULE_event = 8, RULE_cond = 9, 
-		RULE_second = 10, RULE_expr = 11, RULE_status = 12, RULE_exp = 13, RULE_operator = 14, 
+		RULE_actions = 5, RULE_action = 6, RULE_affect = 7, RULE_event = 8, RULE_ifcond = 9, 
+		RULE_elsecond = 10, RULE_expr = 11, RULE_status = 12, RULE_exp = 13, RULE_operator = 14, 
 		RULE_defs = 15, RULE_def = 16;
 	public static final String[] ruleNames = {
 		"r", "setup", "loop", "set", "sets", "actions", "action", "affect", "event", 
-		"cond", "second", "expr", "status", "exp", "operator", "defs", "def"
+		"ifcond", "elsecond", "expr", "status", "exp", "operator", "defs", "def"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -265,7 +265,7 @@ public class HelloParser extends Parser {
 				((SetContext)_localctx).label = match(ID);
 				setState(48);
 				match(INPUT);
-				((SetContext)_localctx).texte =  "pinMode(" +(((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null) + ", INPUT);";
+				Database.add((((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null), "INPUT"); ((SetContext)_localctx).texte =  "pinMode(" +(((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null) + ", INPUT);";
 				}
 				break;
 			case 2:
@@ -275,7 +275,7 @@ public class HelloParser extends Parser {
 				((SetContext)_localctx).label = match(ID);
 				setState(51);
 				match(OUTPUT);
-				((SetContext)_localctx).texte =  "pinMode(" +(((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null) + ", OUTPUT);";
+				Database.add((((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null), "OUTPUT"); ((SetContext)_localctx).texte =  "pinMode(" +(((SetContext)_localctx).label!=null?((SetContext)_localctx).label.getText():null) + ", OUTPUT);";
 				}
 				break;
 			}
@@ -421,15 +421,15 @@ public class HelloParser extends Parser {
 		public String texte;
 		public AffectContext a;
 		public EventContext e;
-		public CondContext c;
+		public IfcondContext c;
 		public AffectContext affect() {
 			return getRuleContext(AffectContext.class,0);
 		}
 		public EventContext event() {
 			return getRuleContext(EventContext.class,0);
 		}
-		public CondContext cond() {
-			return getRuleContext(CondContext.class,0);
+		public IfcondContext ifcond() {
+			return getRuleContext(IfcondContext.class,0);
 		}
 		public ActionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -472,7 +472,7 @@ public class HelloParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(75);
-				((ActionContext)_localctx).c = cond();
+				((ActionContext)_localctx).c = ifcond();
 				((ActionContext)_localctx).texte =  ((ActionContext)_localctx).c.texte;
 				}
 				break;
@@ -523,7 +523,7 @@ public class HelloParser extends Parser {
 			((AffectContext)_localctx).label = match(ID);
 			setState(81);
 			((AffectContext)_localctx).value = status();
-			Database.add((((AffectContext)_localctx).label!=null?((AffectContext)_localctx).label.getText():null), (((AffectContext)_localctx).value!=null?_input.getText(((AffectContext)_localctx).value.start,((AffectContext)_localctx).value.stop):null)); ((AffectContext)_localctx).texte =  (((AffectContext)_localctx).label!=null?((AffectContext)_localctx).label.getText():null) + "=" + (((AffectContext)_localctx).value!=null?_input.getText(((AffectContext)_localctx).value.start,((AffectContext)_localctx).value.stop):null) + ";";
+			((AffectContext)_localctx).texte =  (((AffectContext)_localctx).label!=null?((AffectContext)_localctx).label.getText():null) + "=" + (((AffectContext)_localctx).value!=null?_input.getText(((AffectContext)_localctx).value.start,((AffectContext)_localctx).value.stop):null) + ";";
 			}
 		}
 		catch (RecognitionException re) {
@@ -588,11 +588,11 @@ public class HelloParser extends Parser {
 		return _localctx;
 	}
 
-	public static class CondContext extends ParserRuleContext {
+	public static class IfcondContext extends ParserRuleContext {
 		public String texte;
 		public ExprContext e;
 		public ActionContext body;
-		public SecondContext s;
+		public ElsecondContext s;
 		public TerminalNode IF() { return getToken(HelloParser.IF, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
@@ -600,38 +600,38 @@ public class HelloParser extends Parser {
 		public ActionContext action() {
 			return getRuleContext(ActionContext.class,0);
 		}
-		public SecondContext second() {
-			return getRuleContext(SecondContext.class,0);
+		public ElsecondContext elsecond() {
+			return getRuleContext(ElsecondContext.class,0);
 		}
-		public CondContext(ParserRuleContext parent, int invokingState) {
+		public IfcondContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_cond; }
+		@Override public int getRuleIndex() { return RULE_ifcond; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof HelloListener ) ((HelloListener)listener).enterCond(this);
+			if ( listener instanceof HelloListener ) ((HelloListener)listener).enterIfcond(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof HelloListener ) ((HelloListener)listener).exitCond(this);
+			if ( listener instanceof HelloListener ) ((HelloListener)listener).exitIfcond(this);
 		}
 	}
 
-	public final CondContext cond() throws RecognitionException {
-		CondContext _localctx = new CondContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_cond);
+	public final IfcondContext ifcond() throws RecognitionException {
+		IfcondContext _localctx = new IfcondContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_ifcond);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(89);
 			match(IF);
 			setState(90);
-			((CondContext)_localctx).e = expr();
+			((IfcondContext)_localctx).e = expr();
 			setState(91);
-			((CondContext)_localctx).body = action();
+			((IfcondContext)_localctx).body = action();
 			setState(92);
-			((CondContext)_localctx).s = second();
-			((CondContext)_localctx).texte =  "if(" + ((CondContext)_localctx).e.texte + "){\n" + ((CondContext)_localctx).body.texte +"\n}" + ((CondContext)_localctx).s.texte;
+			((IfcondContext)_localctx).s = elsecond();
+			((IfcondContext)_localctx).texte =  "if(" + ((IfcondContext)_localctx).e.texte + "){\n" + ((IfcondContext)_localctx).body.texte +"\n}" + ((IfcondContext)_localctx).s.texte;
 			}
 		}
 		catch (RecognitionException re) {
@@ -645,30 +645,30 @@ public class HelloParser extends Parser {
 		return _localctx;
 	}
 
-	public static class SecondContext extends ParserRuleContext {
+	public static class ElsecondContext extends ParserRuleContext {
 		public String texte;
 		public ActionContext bod;
 		public TerminalNode ELSE() { return getToken(HelloParser.ELSE, 0); }
 		public ActionContext action() {
 			return getRuleContext(ActionContext.class,0);
 		}
-		public SecondContext(ParserRuleContext parent, int invokingState) {
+		public ElsecondContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_second; }
+		@Override public int getRuleIndex() { return RULE_elsecond; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof HelloListener ) ((HelloListener)listener).enterSecond(this);
+			if ( listener instanceof HelloListener ) ((HelloListener)listener).enterElsecond(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof HelloListener ) ((HelloListener)listener).exitSecond(this);
+			if ( listener instanceof HelloListener ) ((HelloListener)listener).exitElsecond(this);
 		}
 	}
 
-	public final SecondContext second() throws RecognitionException {
-		SecondContext _localctx = new SecondContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_second);
+	public final ElsecondContext elsecond() throws RecognitionException {
+		ElsecondContext _localctx = new ElsecondContext(_ctx, getState());
+		enterRule(_localctx, 20, RULE_elsecond);
 		try {
 			setState(100);
 			_errHandler.sync(this);
@@ -679,14 +679,14 @@ public class HelloParser extends Parser {
 				setState(95);
 				match(ELSE);
 				setState(96);
-				((SecondContext)_localctx).bod = action();
-				 ((SecondContext)_localctx).texte =  "else{\n" + ((SecondContext)_localctx).bod.texte+ "\n}";
+				((ElsecondContext)_localctx).bod = action();
+				 ((ElsecondContext)_localctx).texte =  "else{\n" + ((ElsecondContext)_localctx).bod.texte+ "\n}";
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				((SecondContext)_localctx).texte =  "";
+				((ElsecondContext)_localctx).texte =  "";
 				}
 				break;
 			}

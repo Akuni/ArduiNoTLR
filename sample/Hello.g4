@@ -26,7 +26,7 @@ actions returns [String texte]: a=action as=actions {$texte = $a.texte + "\n" + 
 action returns [String texte] :
         a=affect {$texte = $a.texte;}
           | e=event {$texte = $e.texte;}
-          | c=cond {$texte = $c.texte;}
+          | c=ifcond {$texte = $c.texte;}
 ;
 
 // AFFECTATION
@@ -40,11 +40,11 @@ event  returns [String texte]:
 ;
 
 // CONDITION
-cond   returns [String texte]:
-      IF e=expr body=action s=second {$texte = "if(" + $e.texte + "){\n" + $body.texte +"\n}" + $s.texte;}
+ifcond   returns [String texte]:
+      IF e=expr body=action s=elsecond {$texte = "if(" + $e.texte + "){\n" + $body.texte +"\n}" + $s.texte;}
 ;
 
-second returns [String texte] :
+elsecond returns [String texte] :
     ELSE bod=action { $texte = "else{\n" + $bod.texte+ "\n}";}
     | {$texte = "";}
 ;

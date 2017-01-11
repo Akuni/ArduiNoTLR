@@ -123,25 +123,25 @@ public class HelloBaseListener implements HelloListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCond(HelloParser.CondContext ctx) { }
+	@Override public void enterIfcond(HelloParser.IfcondContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCond(HelloParser.CondContext ctx) { }
+	@Override public void exitIfcond(HelloParser.IfcondContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSecond(HelloParser.SecondContext ctx) { }
+	@Override public void enterElsecond(HelloParser.ElsecondContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSecond(HelloParser.SecondContext ctx) { }
+	@Override public void exitElsecond(HelloParser.ElsecondContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
