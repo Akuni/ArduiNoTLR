@@ -24,25 +24,24 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(App app) {
-        result.append(app.getName());
-        /*w("// Wiring code generated from an ArduinoML model");
+        w("// Wiring code generated from an ArduinoML model");
         w(String.format("// Application name: %s\n", app.getName()));
 
-        w("void setup(){");
+        w("void setup() {");
         for (Brick brick : app.getBricks()) {
             brick.accept(this);
         }
         w("}\n");
 
-        w("long time = 0; long debounce = 200;\n");
+        w("long timef = 0; long debounce = 200;\n");
 
         for (State state : app.getStates()) {
             state.accept(this);
         }
 
         w("void loop() {");
-        w(String.format("  state_%s();", app.getInitial().getName()));
-        w("}");*/
+        //w(String.format("  state_%s();", app.getInitial().getName()));
+        w("}");
     }
 
     @Override public void visit(Actuator actuator) {
@@ -54,11 +53,11 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(State state) {
-        w(String.format("void state_%s() {", state.getName()));
+        w(String.format("void state_%s() {\n", state.getName()));
         for (Action action : state.getActions()) {
             action.accept(this);
         }
-        w("  boolean guard = millis() - time > debounce;");
+        w("\tboolean guard = millis() - time > debounce;");
         context.put(CURRENT_STATE, state);
         state.getTransition().accept(this);
         w("}\n");
@@ -66,17 +65,17 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Transition transition) {
-        w(String.format("  if( digitalRead(%d) == %s && guard ) {",
+        w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
                 transition.getSensor().getPin(), transition.getValue()));
-        w("    time = millis();");
-        w(String.format("    state_%s();", transition.getNext().getName()));
-        w("  } else {");
-        w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
-        w("  }");
+        w("\ttime = millis();");
+        w(String.format("\t\tstate_%s();", transition.getNext().getName()));
+        w("\t} else {");
+        w(String.format("\t\tstate_%s();", ((State) context.get(CURRENT_STATE)).getName()));
+        w("\t}");
     }
 
     @Override public void visit(Action action) {
-        w(String.format("  digitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+        w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
     }
 
 }

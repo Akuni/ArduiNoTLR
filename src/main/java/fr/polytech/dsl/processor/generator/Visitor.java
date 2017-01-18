@@ -24,14 +24,9 @@ public abstract class Visitor<T> {
 
     public abstract void visit(Sensor sensor);
 
-
-    /***********************
-     ** Helper mechanisms **
-     ***********************/
-
     protected Map<String, Object> context = new HashMap<>();
 
-    protected T result;
+    T result;
 
     public T getResult() {
         return result;

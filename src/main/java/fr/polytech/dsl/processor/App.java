@@ -64,6 +64,10 @@ public class App implements NamedElement, Visitable {
         from.setTransition(transition);
     }
 
+    public <T> T getBinding(String name, Class<T> type) {
+        return null;
+    }
+
     public Object generateCode() {
         Visitor codeGenerator = new ToWiring();
         accept(codeGenerator);
