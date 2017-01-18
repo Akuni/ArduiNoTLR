@@ -2,7 +2,7 @@
 grammar Arduino;
 
 // general rule
-app : d=defs  s=setup l=loop {System.out.println($d.texte +'\n'+ $s.texte+'\n' + $l.texte); };
+app : print; //d=defs  s=setup l=loop {System.out.println($d.texte +'\n'+ $s.texte+'\n' + $l.texte); };
 
 print : 'print' text=STRING;
 
@@ -128,7 +128,7 @@ ID      : [a-z]+;
 //STATUS  : [A-Z]+ ;
 INT     : [0-9]+ ;
 DEC     : INT '.' INT;
-
+STRING  : '"'[a-zA-Z0-9- ]+'"';
 // skip spaces, tabs, newlines
 WS      : [ \r\n]+ -> skip ;
 
