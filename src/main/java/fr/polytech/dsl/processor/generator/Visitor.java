@@ -2,6 +2,7 @@ package fr.polytech.dsl.processor.generator;
 
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.Action;
+import fr.polytech.dsl.processor.behavioral.Delay;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.behavioral.Transition;
 import fr.polytech.dsl.processor.structural.Actuator;
@@ -23,6 +24,8 @@ public abstract class Visitor<T> {
     public abstract void visit(Actuator actuator);
 
     public abstract void visit(Sensor sensor);
+
+    public abstract void visit(Delay delay);
 
 
     /***********************

@@ -1,6 +1,7 @@
 package fr.polytech.dsl.processor;
 
 import fr.polytech.dsl.processor.behavioral.Action;
+import fr.polytech.dsl.processor.behavioral.Delay;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.behavioral.Transition;
 import fr.polytech.dsl.processor.generator.ToWiring;
@@ -21,6 +22,7 @@ import java.util.Map;
 @Data
 public class App implements NamedElement, Visitable {
 
+    private int DEFAULT_ERROR_PIN = 12;
     private String name;
     private List<Brick> bricks = new ArrayList<>();
     private List<State> states = new ArrayList<>();
@@ -54,6 +56,42 @@ public class App implements NamedElement, Visitable {
         state.setActions(actions);
         this.states.add(state);
         this.binding.put(name, state);
+    }
+
+    public  void createErrorState(String name, int action){
+        // error led on pin 12
+        Actuator errorLed = new Actuator();
+        errorLed.setName("error");
+        errorLed.setPin(DEFAULT_ERROR_PIN);
+
+        // define error behavior
+        State errorState = new State();
+        errorState.setName(name);
+
+        List<Action> actions = new ArrayList<>();
+        // default led ON
+        Action errorLedON = new Action();
+        errorLedON.setActuator(errorLed);
+        errorLedON.setValue(Signal.HIGH);
+
+        Delay delay = new Delay();
+        delay.setTime(500);
+
+        Action errorLedOFF = new Action();
+        errorLedOFF.setActuator(errorLed);
+        errorLedOFF.setValue(Signal.LOW);
+
+
+        actions.add(errorLedON);
+        actions.add(delay);
+        actions.add(errorLedOFF);
+        actions.add(delay);
+
+        errorState.setActions(actions);
+
+        this.states.add(errorState);
+        this.binding.put(name, errorState);
+
     }
 
     public void createTransition(State from, State to, Sensor sensor, Signal value) {

@@ -2,6 +2,7 @@ package fr.polytech.dsl.processor.generator;
 
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.Action;
+import fr.polytech.dsl.processor.behavioral.Delay;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.behavioral.Transition;
 import fr.polytech.dsl.processor.structural.Actuator;
@@ -77,6 +78,10 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override public void visit(Action action) {
         w(String.format("  digitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+    }
+
+    @Override public void visit(Delay delay) {
+        w(String.format("  delay(%d);", delay.getTime()));
     }
 
 }
