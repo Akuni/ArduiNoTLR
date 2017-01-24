@@ -1,9 +1,6 @@
 package fr.polytech.dsl.processor;
 
-import fr.polytech.dsl.processor.behavioral.Action;
-import fr.polytech.dsl.processor.behavioral.Delay;
-import fr.polytech.dsl.processor.behavioral.State;
-import fr.polytech.dsl.processor.behavioral.Transition;
+import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.generator.ToWiring;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;
@@ -102,6 +99,17 @@ public class App implements NamedElement, Visitable {
         from.setTransition(transition);
     }
 
+    public void bind(String label, Type type){
+        // store object type
+        binding.put(label, type);
+    }
+
+    public Object find(String label){
+        if(binding.containsKey(label))
+            return binding.get(label);
+        return null;
+    }
+
     public <T> T getBinding(String name, Class<T> type) {
         return null;
     }
@@ -112,4 +120,14 @@ public class App implements NamedElement, Visitable {
         return codeGenerator.getResult();
     }
 
+    public void displayOn(Type t, String value) {
+        if(!"LCD".equals(t.name())){
+            System.out.println("ERROR : output is not a LCD");
+        } else
+            System.out.println("DISPLAYING ON A " + t.name() + " : " + value );
+    }
+
+    public void displayMorseOn(Type t, String value) {
+        System.out.println("DISPLAYING ON A " + t.name() + " : " + value  + " IN MORSE");
+    }
 }

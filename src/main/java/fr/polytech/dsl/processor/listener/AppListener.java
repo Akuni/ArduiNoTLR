@@ -2,6 +2,7 @@ package fr.polytech.dsl.processor.listener;
 
 import fr.polytech.dsl.language.ArduinoBaseListener;
 import fr.polytech.dsl.processor.App;
+import fr.polytech.dsl.processor.behavioral.Type;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -24,8 +25,29 @@ public class AppListener extends ArduinoBaseListener {
         // input connection
         if(ctx.itype != null && ctx.otype == null){
             app.createSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+            if(Type.getTypeByName( ctx.itype.getText()) != null)
+                app.bind(ctx.cpt.getText(), Type.getTypeByName(ctx.itype.getText()));
+            // TODO : else throw exception ?
         } else  if(ctx.itype == null && ctx.otype != null){ // output connection
             app.createActuator(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+            if(Type.getTypeByName( ctx.otype.getText()) != null)
+                app.bind(ctx.cpt.getText(), Type.getTypeByName(ctx.otype.getText()));
+        }
+    }
+
+    @Override public void exitDisplay(DisplayContext ctx) throws NumberFormatException {
+        // about to display on ...
+        if(ctx.cpt != null
+                && app.find(ctx.cpt.getText()) != null
+                && ctx.value != null){
+            Type t = (Type) app.find(ctx.cpt.getText());
+            String value = ctx.value.getText();
+            if(ctx.m == null){
+                // standard display
+                app.displayOn(t, value);
+            } else {
+                app.displayMorseOn(t, value);
+            }
         }
     }
 

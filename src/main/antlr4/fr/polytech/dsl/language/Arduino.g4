@@ -2,12 +2,34 @@
 grammar Arduino;
 
 // Parser Rules
-app : named (connect)+ EOF;
+app : named (connect | display)+ EOF;
 
 named: NAMED name=NAME;
 
-connect: CONNECT itype=input_type cpt=ID ON fcd=facade port=INT
+connect : CONNECT itype=input_type cpt=ID ON fcd=facade port=INT
         | CONNECT otype=output_type cpt=ID ON fdc=facade port=INT;
+
+// object oriented function
+// like lcd .display ("test")
+//      ID  function   PARAMETERS
+oof     : ID fn=LABEL p=params;
+params  : LABEL params
+        | INT params
+        | DEC params
+        | STRING params
+        | ; // nothing
+
+// declarative style
+// display on   LCD   "TEST"
+// LABEL   ON OUTPUT  PARAMETERS
+decl    : fn=LABEL ON cpt=ID p=params;
+
+
+// static version
+// display on  LEC   "TEST"
+// DISPLAY ON OUTPUT PARAMETERS
+display : DISPLAY ON cpt=ID value=STRING (m=morse)?;
+morse   : IN MORSE;
 
 //component: input_type |output_type;
 input_type : BUTTON;
@@ -17,23 +39,27 @@ facade: PIN | BUS;
 // Lexer Rules
 
 // Keywords
-NAMED: 'named';
-CONNECT: 'connect';
-LED: 'led';
-LCD: 'lcd';
-BUTTON: 'button';
-ON: 'on';
-PIN: 'pin';
-BUS: 'bus';
+NAMED   : 'named';
+CONNECT : 'connect';
+LED     : 'led';
+LCD     : 'lcd';
+BUTTON  : 'button';
+ON      : 'on';
+PIN     : 'pin';
+BUS     : 'bus';
+DISPLAY : 'display';
+IN      : 'in';
+MORSE   : 'morse';
 
 // Primitives
 TRUE    : 'true';
 FALSE   : 'false';
 INT     : [0-9]+;
 DEC     : INT '.' INT;
-STRING  : '"'[a-zA-Z0-9]+'"';
+STRING  : '"'[a-zA-Z0-9_ ]+'"';
 ID      : [A-Z_]+;
-NAME    : [A-Z][a-zA-z_]+;
+NAME    : [A-Z][a-zA-Z_]+;
+LABEL   : [a-z][a-z_]+;
 
 // Skip spaces, tabs, newlines
 WS      : [ \r\n]+ -> skip;
