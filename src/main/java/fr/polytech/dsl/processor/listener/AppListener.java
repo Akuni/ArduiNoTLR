@@ -21,7 +21,12 @@ public class AppListener extends ArduinoBaseListener {
 
     @SneakyThrows(NumberFormatException.class)
     @Override public void exitConnect(ConnectContext ctx) throws NumberFormatException {
-        app.createSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+        // input connection
+        if(ctx.itype != null && ctx.otype == null){
+            app.createSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+        } else  if(ctx.itype == null && ctx.otype != null){ // output connection
+            app.createActuator(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+        }
     }
 
 }

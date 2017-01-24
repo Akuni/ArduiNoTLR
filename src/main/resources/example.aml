@@ -1,3 +1,4 @@
 named Test
 
-connect led sensor on pin 12
+connect led LED on pin 12
+connect button B on pin 2
