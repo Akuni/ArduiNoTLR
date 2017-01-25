@@ -5,9 +5,9 @@ import fr.polytech.dsl.processor.behavioral.Action;
 import fr.polytech.dsl.processor.behavioral.Delay;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.behavioral.Transition;
-import fr.polytech.dsl.processor.structural.Actuator;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
+import fr.polytech.dsl.processor.structural.actuator.Actuator;
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
@@ -34,19 +34,19 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
         w("}\n");
 
-        w("long timef = 0; long debounce = 200;\n");
+        w("long time = 0; long debounce = 200;\n");
 
         for (State state : app.getStates()) {
             state.accept(this);
         }
 
         w("void loop() {");
-        //w(String.format("  state_%s();", app.getInitial().getName()));
+        w(String.format("  state_%s();", app.getInitial().getName()));
         w("}");
     }
 
     @Override public void visit(Actuator actuator) {
-        w(String.format("  pinMode(%d, OUTPUT); // %s [Actuator]", actuator.getPin(), actuator.getName()));
+        w(String.format("  pinMode(%d, OUTPUT); // %s [%s]", actuator.getPin(), actuator.getName(), actuator.getClass().getSimpleName()));
     }
 
     @Override public void visit(Sensor sensor) {
@@ -54,7 +54,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(State state) {
-        w(String.format("void state_%s() {\n", state.getName()));
+        w(String.format("void state_%s() {", state.getName()));
         for (Action action : state.getActions()) {
             action.accept(this);
         }
@@ -62,7 +62,6 @@ public class ToWiring extends Visitor<StringBuffer> {
         context.put(CURRENT_STATE, state);
         state.getTransition().accept(this);
         w("}\n");
-
     }
 
     @Override public void visit(Transition transition) {

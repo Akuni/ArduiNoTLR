@@ -3,11 +3,10 @@ package fr.polytech.dsl.processor.behavioral;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by Akuni on 18/01/2017.
- */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Delay extends Action implements Visitable {
 
     private int time;
@@ -15,4 +14,5 @@ public class Delay extends Action implements Visitable {
     @Override public void accept(Visitor visitor) {
         visitor.visit(this);
     }
+
 }

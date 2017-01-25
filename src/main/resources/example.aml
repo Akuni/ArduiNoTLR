@@ -1,6 +1,12 @@
 named Test
 
-connect lcd LCD on pin 12
-connect button B on pin 2
+connect led TOTO on pin 12
+connect button TRIGGER on pin 8
 
-display on LCD "HELLO"
+set TOTO on HIGH when switch_on
+set TOTO on LOW when switch_off
+
+start on switch_on
+
+when TRIGGER is HIGH then change from switch_off to switch_on
+when TRIGGER is LOW then change from switch_on to switch_off

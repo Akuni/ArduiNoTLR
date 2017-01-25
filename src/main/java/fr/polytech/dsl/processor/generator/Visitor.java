@@ -5,8 +5,8 @@ import fr.polytech.dsl.processor.behavioral.Action;
 import fr.polytech.dsl.processor.behavioral.Delay;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.behavioral.Transition;
-import fr.polytech.dsl.processor.structural.Actuator;
 import fr.polytech.dsl.processor.structural.Sensor;
+import fr.polytech.dsl.processor.structural.actuator.Actuator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public abstract class Visitor<T> {
     public abstract void visit(Delay delay);
 
 
-    protected Map<String, Object> context = new HashMap<>();
+    Map<String, Object> context = new HashMap<>();
 
     T result;
 

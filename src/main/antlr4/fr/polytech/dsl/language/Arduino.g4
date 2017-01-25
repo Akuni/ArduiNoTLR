@@ -2,37 +2,49 @@
 grammar Arduino;
 
 // Parser Rules
-app : named (connect | display)+ EOF;
+app      : named (connect)+ (set)+ start (display | when)+ EOF;
 
-named: NAMED name=NAME;
+named    : NAMED name=NAME;
 
-connect : CONNECT itype=input_type cpt=ID ON fcd=facade port=INT
-        | CONNECT otype=output_type cpt=ID ON fdc=facade port=INT;
+connect  : CONNECT ac=actuator cpt=ID ON fcd=facade port=INT;
 
+set      : SET ac=ID ON val=ID WHEN state=LABEL;
+
+start    : START ON state=LABEL;
+
+when     : WHEN sensor=ID IS val=ID THEN CHANGE FROM from=LABEL TO to=LABEL;
 
 // static version
 // display on  LEC   "TEST"
-display : DISPLAY ON cpt=ID value=STRING (m=morse)?;
-morse   : IN MORSE;
+display  : DISPLAY value=STRING ON cpt=ID (m=morse)?;
+morse    : IN MORSE;
 
-//component: input_type |output_type;
-input_type : BUTTON;
-output_type: LED | LCD ;
-facade: PIN | BUS;
+actuator : LCD | LED | BUTTON;
+facade   : PIN | BUS;
 
 // Lexer Rules
 
 // Keywords
 NAMED   : 'named';
 CONNECT : 'connect';
+SET     : 'set';
 LED     : 'led';
+START   : 'start';
 LCD     : 'lcd';
+THEN    : 'then';
+CHANGE  : 'change';
+FROM    : 'from';
+TO      : 'to';
 BUTTON  : 'button';
 ON      : 'on';
+WHEN    : 'when';
+IS      : 'is';
+STATE   : 'state';
 PIN     : 'pin';
 BUS     : 'bus';
 DISPLAY : 'display';
 IN      : 'in';
+TOGGLE  : 'toggle';
 MORSE   : 'morse';
 
 // Primitives
