@@ -11,6 +11,11 @@ import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.Signal;
 import lombok.Data;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +24,18 @@ import java.util.Map;
 @Data
 public class App implements NamedElement, Visitable {
 
+    private final int MIN_ALPHABET_SIZE = 26;
+    private final String LETTER_LABEL = "letter";
+    private final String CODE_LABEL = "code";
+
+
+
     private int DEFAULT_ERROR_PIN = 12;
     private String name;
     private List<Brick> bricks = new ArrayList<>();
     private List<State> states = new ArrayList<>();
     private State initial;
+    private Map<String, String> morseConversion = new HashMap<>();
 
     private Map<String, Object> binding = new HashMap<>();
 
@@ -127,5 +139,16 @@ public class App implements NamedElement, Visitable {
 
     public void displayMorseOn(Type t, String value) {
         System.out.println("DISPLAYING ON A " + t.name() + " : " + value  + " IN MORSE");
+    }
+
+    public void loadMorseCode(String path){
+        JsonReader reader = Json.createReader(new StringReader(path));
+        JsonArray morseCode = reader.readArray();
+        reader.close();
+        assert morseCode.size() >= MIN_ALPHABET_SIZE;
+        for(JsonObject jso : morseCode.getValuesAs(JsonObject.class)){
+            morseConversion.put(jso.getString(LETTER_LABEL), jso.getString(CODE_LABEL));
+        }
+
     }
 }

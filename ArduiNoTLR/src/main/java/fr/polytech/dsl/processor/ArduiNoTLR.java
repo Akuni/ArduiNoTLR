@@ -21,6 +21,7 @@ public class ArduiNoTLR {
      */
     public static void main(String... args) throws Exception {
         App app = create(ArduiNoTLR.class.getResourceAsStream("/example.aml"));
+        app.loadMorseCode("/code.json");
         System.out.println(app.generateCode());
     }
 

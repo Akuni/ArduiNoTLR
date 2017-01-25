@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.polytech.dsl</groupId>
+    <groupId>fr.polytech.dsl.processor</groupId>
     <artifactId>arduinotlr</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
