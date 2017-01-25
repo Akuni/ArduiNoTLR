@@ -9,7 +9,6 @@ import fr.polytech.dsl.processor.behavioral.Transition;
 import fr.polytech.dsl.processor.generator.ToWiring;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;
-import fr.polytech.dsl.processor.model.MorseConversion;
 import fr.polytech.dsl.processor.model.MorseRepresentation;
 import fr.polytech.dsl.processor.model.NamedElement;
 import fr.polytech.dsl.processor.structural.Brick;
@@ -22,16 +21,10 @@ import lombok.Data;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Data
 public class App implements NamedElement, Visitable {
@@ -149,12 +142,9 @@ public class App implements NamedElement, Visitable {
         Gson gson = new Gson();
         try {
             JsonReader reader = new JsonReader(new FileReader(path));
-            MorseConversion[] data = gson.fromJson(reader, MorseConversion[].class);
-            for(MorseConversion mc : data){
+            MorseRepresentation[] data = gson.fromJson(reader, MorseRepresentation[].class);
+            for(MorseRepresentation mc : data){
                 morseConversion.put(mc.getLetter(), mc.getCode());
-            }
-            for(Object o : morseConversion.keySet()){
-                System.out.println(morseConversion.get(o));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
