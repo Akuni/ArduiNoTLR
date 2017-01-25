@@ -1,25 +1,37 @@
 package fr.polytech.dsl.processor;
 
-import fr.polytech.dsl.processor.behavioral.*;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import fr.polytech.dsl.processor.behavioral.Action;
+import fr.polytech.dsl.processor.behavioral.Delay;
+import fr.polytech.dsl.processor.behavioral.State;
+import fr.polytech.dsl.processor.behavioral.Transition;
 import fr.polytech.dsl.processor.generator.ToWiring;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;
+import fr.polytech.dsl.processor.model.MorseConversion;
+import fr.polytech.dsl.processor.model.MorseRepresentation;
 import fr.polytech.dsl.processor.model.NamedElement;
-import fr.polytech.dsl.processor.structural.Actuator;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.Signal;
+import fr.polytech.dsl.processor.structural.actuator.Actuator;
+import fr.polytech.dsl.processor.structural.actuator.Lcd;
+import fr.polytech.dsl.processor.structural.actuator.Led;
 import lombok.Data;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Data
 public class App implements NamedElement, Visitable {
@@ -51,8 +63,15 @@ public class App implements NamedElement, Visitable {
         this.binding.put(name, sensor);
     }
 
-    public void createActuator(String name, Integer pinNumber) {
-        Actuator actuator = new Actuator();
+    public void createLed(String name, Integer pinNumber) {
+        setupActuator(new Led(), name, pinNumber);
+    }
+
+    public void createLcd(String name, Integer pinNumber) {
+        setupActuator(new Lcd(), name, pinNumber);
+    }
+
+    private void setupActuator(Actuator actuator, String name, Integer pinNumber) {
         actuator.setName(name);
         actuator.setPin(pinNumber);
         this.bricks.add(actuator);
@@ -67,9 +86,9 @@ public class App implements NamedElement, Visitable {
         this.binding.put(name, state);
     }
 
-    public  void createErrorState(String name, int action){
+    public void createErrorState(String name, int action) {
         // error led on pin 12
-        Actuator errorLed = new Actuator();
+        Led errorLed = new Led();
         errorLed.setName("error");
         errorLed.setPin(DEFAULT_ERROR_PIN);
 
@@ -100,7 +119,6 @@ public class App implements NamedElement, Visitable {
 
         this.states.add(errorState);
         this.binding.put(name, errorState);
-
     }
 
     public void createTransition(State from, State to, Sensor sensor, Signal value) {
@@ -111,43 +129,35 @@ public class App implements NamedElement, Visitable {
         from.setTransition(transition);
     }
 
-    public void bind(String label, Type type){
-        // store object type
-        binding.put(label, type);
-    }
-
     public <T> T getBinding(String name, Class<T> type) {
-        return type.cast(binding.get(name));
+        Object object = binding.get(name);
+        return object != null ? type.cast(object) : null;
     }
 
     public Object getBinding(String name) {
         return getBinding(name, Object.class);
     }
 
-    public Object generateCode() {
+    Object generateCode() {
         Visitor codeGenerator = new ToWiring();
         accept(codeGenerator);
         return codeGenerator.getResult();
     }
 
-    public void displayOn(Type t, String value) {
-        if(!"LCD".equals(t.name())){
-            System.out.println("ERROR : output is not a LCD");
-        } else
-            System.out.println("DISPLAYING ON A " + t.name() + " : " + value );
-    }
-
-    public void displayMorseOn(Type t, String value) {
-        System.out.println("DISPLAYING ON A " + t.name() + " : " + value  + " IN MORSE");
-    }
 
     public void loadMorseCode(String path){
-        JsonReader reader = Json.createReader(new StringReader(path));
-        JsonArray morseCode = reader.readArray();
-        reader.close();
-        assert morseCode.size() >= MIN_ALPHABET_SIZE;
-        for(JsonObject jso : morseCode.getValuesAs(JsonObject.class)){
-            morseConversion.put(jso.getString(LETTER_LABEL), jso.getString(CODE_LABEL));
+        Gson gson = new Gson();
+        try {
+            JsonReader reader = new JsonReader(new FileReader(path));
+            MorseConversion[] data = gson.fromJson(reader, MorseConversion[].class);
+            for(MorseConversion mc : data){
+                morseConversion.put(mc.getLetter(), mc.getCode());
+            }
+            for(Object o : morseConversion.keySet()){
+                System.out.println(morseConversion.get(o));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
 
     }
