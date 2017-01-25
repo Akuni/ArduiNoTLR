@@ -9,25 +9,9 @@ named: NAMED name=NAME;
 connect : CONNECT itype=input_type cpt=ID ON fcd=facade port=INT
         | CONNECT otype=output_type cpt=ID ON fdc=facade port=INT;
 
-// object oriented function
-// like lcd .display ("test")
-//      ID  function   PARAMETERS
-oof     : ID fn=LABEL p=params;
-params  : LABEL params
-        | INT params
-        | DEC params
-        | STRING params
-        | ; // nothing
-
-// declarative style
-// display on   LCD   "TEST"
-// LABEL   ON OUTPUT  PARAMETERS
-decl    : fn=LABEL ON cpt=ID p=params;
-
 
 // static version
 // display on  LEC   "TEST"
-// DISPLAY ON OUTPUT PARAMETERS
 display : DISPLAY ON cpt=ID value=STRING (m=morse)?;
 morse   : IN MORSE;
 

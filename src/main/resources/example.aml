@@ -1,6 +1,6 @@
 named Test
 
-connect led LED on pin 12
+connect lcd LCD on pin 12
 connect button B on pin 2
 
-display on LED "HELLO"
+display on LCD "HELLO"

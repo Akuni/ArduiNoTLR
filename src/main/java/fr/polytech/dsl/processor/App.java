@@ -104,14 +104,12 @@ public class App implements NamedElement, Visitable {
         binding.put(label, type);
     }
 
-    public Object find(String label){
-        if(binding.containsKey(label))
-            return binding.get(label);
-        return null;
+    public <T> T getBinding(String name, Class<T> type) {
+        return type.cast(binding.get(name));
     }
 
-    public <T> T getBinding(String name, Class<T> type) {
-        return null;
+    public Object getBinding(String name) {
+        return getBinding(name, Object.class);
     }
 
     public Object generateCode() {

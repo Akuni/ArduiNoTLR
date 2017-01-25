@@ -12,7 +12,7 @@ public enum Type {
 
     public String category;
 
-    private Type(String s){
+    Type(String s){
         this.category = s;
     }
 

@@ -23,30 +23,30 @@ public class AppListener extends ArduinoBaseListener {
     @SneakyThrows(NumberFormatException.class)
     @Override public void exitConnect(ConnectContext ctx) throws NumberFormatException {
         // input connection
-        if(ctx.itype != null && ctx.otype == null){
+        if (ctx.itype != null && ctx.otype == null) {
             app.createSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
-            if(Type.getTypeByName( ctx.itype.getText()) != null)
+            if (Type.getTypeByName(ctx.itype.getText()) != null)
                 app.bind(ctx.cpt.getText(), Type.getTypeByName(ctx.itype.getText()));
             // TODO : else throw exception ?
-        } else  if(ctx.itype == null && ctx.otype != null){ // output connection
+        } else if (ctx.itype == null && ctx.otype != null) { // output connection
             app.createActuator(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
-            if(Type.getTypeByName( ctx.otype.getText()) != null)
+            if (Type.getTypeByName(ctx.otype.getText()) != null)
                 app.bind(ctx.cpt.getText(), Type.getTypeByName(ctx.otype.getText()));
         }
     }
 
     @Override public void exitDisplay(DisplayContext ctx) throws NumberFormatException {
         // about to display on ...
-        if(ctx.cpt != null
-                && app.find(ctx.cpt.getText()) != null
-                && ctx.value != null){
-            Type t = (Type) app.find(ctx.cpt.getText());
+        if (ctx.cpt != null
+                && app.getBinding(ctx.cpt.getText()) != null
+                && ctx.value != null) {
+            Type type = app.getBinding(ctx.cpt.getText(), Type.class);
             String value = ctx.value.getText();
-            if(ctx.m == null){
+            if (ctx.m == null) {
                 // standard display
-                app.displayOn(t, value);
+                app.displayOn(type, value);
             } else {
-                app.displayMorseOn(t, value);
+                app.displayMorseOn(type, value);
             }
         }
     }
