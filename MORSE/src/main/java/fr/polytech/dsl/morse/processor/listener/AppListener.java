@@ -19,12 +19,15 @@ public class AppListener extends MorseBaseListener {
     @SneakyThrows(NumberFormatException.class)
     @Override public void exitConnect(ConnectContext ctx) throws NumberFormatException {
         // input connection
-
+        if(ctx.port != null)
+            app.createActuator("LCD", Integer.parseInt(ctx.port.getText()));
+        // todo : else throw exception ?
     }
 
     @Override public void exitDisplay(DisplayContext ctx) throws NumberFormatException {
         // about to display on ...
-
+        if(ctx.value != null)
+            app.createDisplay(ctx.value.getText());
     }
 
 }

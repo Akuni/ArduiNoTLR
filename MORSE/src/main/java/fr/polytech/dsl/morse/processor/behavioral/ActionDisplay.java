@@ -30,10 +30,15 @@ import fr.polytech.dsl.morse.processor.structural.Signal;
 import lombok.Data;
 
 @Data
-public class Action implements Visitable {
+public class ActionDisplay implements Visitable {
 
-    private Signal value;
+    private String message;
     private Actuator actuator;
+
+    public ActionDisplay(Actuator actuator, String message){
+        this.actuator = actuator;
+        this.message = message;
+    }
 
     @Override public void accept(Visitor visitor) {
         visitor.visit(this);

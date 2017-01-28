@@ -1,6 +1,5 @@
-named Test
+connect lcd on bus 2
 
-connect lcd LCD on pin 12
-connect button B on pin 2
-
-display on LCD "HELLO"
+display "HELLO"
+display "ca marche"
+display "mais je sais pas si on devrait mettre une longueur max"
