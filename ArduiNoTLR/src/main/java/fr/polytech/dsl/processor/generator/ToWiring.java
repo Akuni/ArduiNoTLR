@@ -27,10 +27,20 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override public void visit(App app) {
         w("// Wiring code generated from an ArduinoML model");
         w(String.format("// Application name: %s\n", app.getName()));
+        if(app.hasALCD()){
+            w("#include <LiquidCrystal.h> // include a library headfile\n");
+            w("LiquidCrystal lcd(10, 11, 12, 13, 14, 15, 16); //BUS2\n //OR BUS1 values are (2, 3, 4, 5, 6, 7, 8)\n");
+        }
 
         w("void setup() {");
         for (Brick brick : app.getBricks()) {
             brick.accept(this);
+        }
+
+        if(app.hasALCD()){
+            w("  // Init LCD\n" +
+                    "  lcd.begin(16, 2);\n" +
+                    "  lcd.clear();");
         }
         w("}\n");
 

@@ -1,6 +1,6 @@
 named Test
 
-connect led TOTO on pin 12
+connect lcd TOTO on bus 2
 connect button TRIGGER on pin 8
 
 set TOTO on HIGH when switch_on

@@ -138,17 +138,26 @@ public class App implements NamedElement, Visitable {
     }
 
 
-    public void loadMorseCode(String path){
+    public void loadMorseCode(String path) {
         Gson gson = new Gson();
         try {
             JsonReader reader = new JsonReader(new FileReader(path));
             MorseRepresentation[] data = gson.fromJson(reader, MorseRepresentation[].class);
-            for(MorseRepresentation mc : data){
+            for (MorseRepresentation mc : data) {
                 morseConversion.put(mc.getLetter(), mc.getCode());
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
+    }
+
+    public boolean hasALCD(){
+        for(Object o : binding.values()){
+            if(o instanceof Lcd){
+                return true;
+            }
+        }
+        return false;
     }
 }
