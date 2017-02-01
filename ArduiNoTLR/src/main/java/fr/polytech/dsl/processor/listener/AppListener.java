@@ -66,7 +66,11 @@ public class AppListener extends ArduinoBaseListener {
     @Override public void exitConnect(ConnectContext ctx) throws NumberFormatException {
         switch (ctx.ac.getText()) {
             case "lcd":
-                app.createLcd(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+                if ("bus".equals(ctx.fcd.getText())) {
+                    app.createLcd(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+                } else {
+                    throw new IllegalStateException("A lcd can't be connect to '" + ctx.fcd.getText() + "'");
+                }
                 break;
             case "led":
                 app.createLed(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));

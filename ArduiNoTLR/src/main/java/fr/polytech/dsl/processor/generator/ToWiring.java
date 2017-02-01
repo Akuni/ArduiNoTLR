@@ -7,8 +7,6 @@ import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
 import fr.polytech.dsl.processor.structural.actuator.Lcd;
 
-import java.util.Map;
-
 /**
  * Quick and dirty visitor to support the generation of Wiring code
  */
@@ -49,25 +47,21 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w("void loop() {");
-        w(String.format("  state_%s();", app.getInitial().getName()));
+        w(String.format("\tstate_%s();", app.getInitial().getName()));
         w("}");
     }
 
     @Override public void visit(Actuator actuator) {
-        if ((actuator instanceof Lcd)) {
-            visit((Lcd) actuator);
-        } else {
-            w(String.format("\tpinMode(%d, OUTPUT); // %s [%s]", actuator.getPin(), actuator.getName(), actuator.getClass().getSimpleName()));
-        }
+        w(String.format("\tpinMode(%d, OUTPUT);", actuator.getPin()));
     }
 
-    private void visit(Lcd lcd) {
+    @Override public void visit(Lcd lcd) {
         w(String.format("\t%s.begin(16, 2);", lcd.getName()));
         w(String.format("\t%s.clear();", lcd.getName()));
     }
 
     @Override public void visit(Sensor sensor) {
-        w(String.format("\tpinMode(%d, INPUT);  // %s [Sensor]", sensor.getPin(), sensor.getName()));
+        w(String.format("\tpinMode(%d, INPUT);", sensor.getPin()));
     }
 
     @Override public void visit(State state) {
@@ -84,7 +78,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override public void visit(Transition transition) {
         w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
                 transition.getSensor().getPin(), transition.getValue()));
-        w("\ttime = millis();");
+        w("\t\ttime = millis();");
         w(String.format("\t\tstate_%s();", transition.getNext().getName()));
         w("\t} else {");
         w(String.format("\t\tstate_%s();", ((State) context.get(CURRENT_STATE)).getName()));
@@ -92,16 +86,15 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Action action) {
-        if (action instanceof Display) {
-            Display display = (Display) action;
-            if (display.getText().equals("\"\"")) {
-                w(String.format("\t%s.clear();", display.getActuator().getName()));
-            } else {
-                w(String.format("\t%s.clear();", display.getActuator().getName()));
-                w(String.format("\t%s.print(%s);", display.getActuator().getName(), display.getText()));
-            }
+        w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+    }
+
+    @Override public void visit(Display display) {
+        if (display.getText().equals("\"\"")) {
+            w(String.format("\t%s.clear();", display.getActuator().getName()));
         } else {
-            w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+            w(String.format("\t%s.clear();", display.getActuator().getName()));
+            w(String.format("\t%s.print(%s);", display.getActuator().getName(), display.getText()));
         }
     }
 
@@ -109,10 +102,4 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("\tdelay(%d);", delay.getTime()));
     }
 
-    private String toMorse(String toConvert, Map<String, String> conversion){
-        final String[] result = {""};
-        toConvert.chars().forEach(i -> {
-            result[0] += conversion.get(String.valueOf(i));});
-        return result[0];
-    }
 }

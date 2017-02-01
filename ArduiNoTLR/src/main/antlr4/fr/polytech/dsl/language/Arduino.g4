@@ -6,8 +6,7 @@ app      : named (connect)+ (set | display)+ start (when)+ EOF;
 
 named    : NAMED name=NAME;
 
-connect  : CONNECT ac=actuator cpt=ID ON fcd=facade port=INT
-            | CONNECT LCD opt=ID ON BUS port=INT;
+connect  : CONNECT ac=actuator cpt=ID ON fcd=facade port=INT;
 
 set      : SET ac=ID ON val=ID WHEN state=LABEL;
 
@@ -17,10 +16,9 @@ when     : WHEN sensor=ID IS val=ID THEN CHANGE FROM from=LABEL TO to=LABEL;
 
 // static version
 // display on  LEC   "TEST"
-display  : state=LABEL':' DISPLAY value=STRING ON cpt=ID (m=morse)?;
-morse    : IN MORSE;
+display  : state=LABEL':' DISPLAY value=STRING ON cpt=ID;
 
-actuator : LED | BUTTON;
+actuator : LED | BUTTON | LCD;
 facade   : PIN | BUS;
 
 // Lexer Rules
