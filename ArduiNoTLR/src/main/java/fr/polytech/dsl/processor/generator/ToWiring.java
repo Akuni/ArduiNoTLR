@@ -9,6 +9,8 @@ import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
 
+import java.util.Map;
+
 /**
  * Quick and dirty visitor to support the generation of Wiring code
  */
@@ -92,4 +94,10 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("  delay(%d);", delay.getTime()));
     }
 
+    private String toMorse(String toConvert, Map<String, String> conversion){
+        final String[] result = {""};
+        toConvert.chars().forEach(i -> {
+            result[0] += conversion.get(String.valueOf(i));});
+        return result[0];
+    }
 }
