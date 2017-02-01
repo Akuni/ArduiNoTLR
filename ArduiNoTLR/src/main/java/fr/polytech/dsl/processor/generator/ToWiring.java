@@ -1,13 +1,11 @@
 package fr.polytech.dsl.processor.generator;
 
 import fr.polytech.dsl.processor.App;
-import fr.polytech.dsl.processor.behavioral.Action;
-import fr.polytech.dsl.processor.behavioral.Delay;
-import fr.polytech.dsl.processor.behavioral.State;
-import fr.polytech.dsl.processor.behavioral.Transition;
+import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
+import fr.polytech.dsl.processor.structural.actuator.Lcd;
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
@@ -27,20 +25,18 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override public void visit(App app) {
         w("// Wiring code generated from an ArduinoML model");
         w(String.format("// Application name: %s\n", app.getName()));
-        if(app.hasALCD()){
-            w("#include <LiquidCrystal.h> // include a library headfile\n");
-            w("LiquidCrystal lcd(10, 11, 12, 13, 14, 15, 16); //BUS2\n //OR BUS1 values are (2, 3, 4, 5, 6, 7, 8)\n");
+        if (app.hasLCD()) {
+            w("#include <LiquidCrystal.h> // include a library headfile");
+            for (Lcd lcd : app.getLcds()) {
+                if (lcd.getPin() == 2) {
+                    w(String.format("LiquidCrystal %s(10, 11, 12, 13, 14, 15, 16);", lcd.getName()));
+                }
+            }
         }
 
-        w("void setup() {");
+        w("\nvoid setup() {");
         for (Brick brick : app.getBricks()) {
             brick.accept(this);
-        }
-
-        if(app.hasALCD()){
-            w("  // Init LCD\n" +
-                    "  lcd.begin(16, 2);\n" +
-                    "  lcd.clear();");
         }
         w("}\n");
 
@@ -56,11 +52,20 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Actuator actuator) {
-        w(String.format("  pinMode(%d, OUTPUT); // %s [%s]", actuator.getPin(), actuator.getName(), actuator.getClass().getSimpleName()));
+        if ((actuator instanceof Lcd)) {
+            visit((Lcd) actuator);
+        } else {
+            w(String.format("\tpinMode(%d, OUTPUT); // %s [%s]", actuator.getPin(), actuator.getName(), actuator.getClass().getSimpleName()));
+        }
+    }
+
+    private void visit(Lcd lcd) {
+        w(String.format("\t%s.begin(16, 2);", lcd.getName()));
+        w(String.format("\t%s.clear();", lcd.getName()));
     }
 
     @Override public void visit(Sensor sensor) {
-        w(String.format("  pinMode(%d, INPUT);  // %s [Sensor]", sensor.getPin(), sensor.getName()));
+        w(String.format("\tpinMode(%d, INPUT);  // %s [Sensor]", sensor.getPin(), sensor.getName()));
     }
 
     @Override public void visit(State state) {
@@ -85,11 +90,21 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Action action) {
-        w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+        if (action instanceof Display) {
+            Display display = (Display) action;
+            if (display.getText().equals("\"\"")) {
+                w(String.format("\t%s.clear();", display.getActuator().getName()));
+            } else {
+                w(String.format("\t%s.clear();", display.getActuator().getName()));
+                w(String.format("\t%s.print(%s);", display.getActuator().getName(), display.getText()));
+            }
+        } else {
+            w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+        }
     }
 
     @Override public void visit(Delay delay) {
-        w(String.format("  delay(%d);", delay.getTime()));
+        w(String.format("\tdelay(%d);", delay.getTime()));
     }
 
 }

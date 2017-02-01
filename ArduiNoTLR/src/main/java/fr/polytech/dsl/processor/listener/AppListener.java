@@ -4,6 +4,8 @@ import com.google.common.collect.Maps;
 import fr.polytech.dsl.language.ArduinoBaseListener;
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.Action;
+import fr.polytech.dsl.processor.behavioral.Delay;
+import fr.polytech.dsl.processor.behavioral.Display;
 import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.Signal;
@@ -14,6 +16,7 @@ import fr.polytech.dsl.processor.structural.actuator.Led;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -75,19 +78,13 @@ public class AppListener extends ArduinoBaseListener {
     }
 
     @Override public void exitDisplay(DisplayContext ctx) throws NumberFormatException {
-        // about to display on ...
-        /*if (ctx.cpt != null
-                && app.getBinding(ctx.cpt.getText()) != null
-                && ctx.value != null) {
-            Type type = app.getBinding(ctx.cpt.getText(), Type.class);
-            String value = ctx.value.getText();
-            if (ctx.m == null) {
-                // standard display
-                app.displayOn(type, value);
-            } else {
-                app.displayMorseOn(type, value);
-            }
-        }*/
+        Lcd lcd = app.getBinding(ctx.cpt.getText(), Lcd.class);
+        Display action = new Display();
+        action.setActuator(lcd);
+        action.setText(ctx.value.getText());
+        Delay delay = new Delay();
+        delay.setTime(100);
+        app.createState(ctx.state.getText(), Arrays.asList(action, delay));
     }
 
 }

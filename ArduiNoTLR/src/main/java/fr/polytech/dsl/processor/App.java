@@ -21,10 +21,7 @@ import lombok.Data;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class App implements NamedElement, Visitable {
@@ -32,13 +29,12 @@ public class App implements NamedElement, Visitable {
     private final int MIN_ALPHABET_SIZE = 26;
     private final String LETTER_LABEL = "letter";
     private final String CODE_LABEL = "code";
-
-
-
     private int DEFAULT_ERROR_PIN = 12;
+
     private String name;
     private List<Brick> bricks = new ArrayList<>();
     private List<State> states = new ArrayList<>();
+    private List<Lcd> lcds = new ArrayList<>();
     private State initial;
     private Map<String, String> morseConversion = new HashMap<>();
 
@@ -61,7 +57,9 @@ public class App implements NamedElement, Visitable {
     }
 
     public void createLcd(String name, Integer pinNumber) {
-        setupActuator(new Lcd(), name, pinNumber);
+        Lcd lcd = new Lcd();
+        setupActuator(lcd, name, pinNumber);
+        lcds.add(lcd);
     }
 
     private void setupActuator(Actuator actuator, String name, Integer pinNumber) {
@@ -72,11 +70,19 @@ public class App implements NamedElement, Visitable {
     }
 
     public void createState(String name, List<Action> actions) {
-        State state = new State();
-        state.setName(name);
-        state.setActions(actions);
-        this.states.add(state);
-        this.binding.put(name, state);
+        State state = getBinding(name, State.class);
+        if (state != null) {
+            List<Action> merge = new ArrayList<>();
+            merge.addAll(actions);
+            merge.addAll(state.getActions());
+            state.setActions(merge);
+        } else {
+            state = new State();
+            state.setName(name);
+            state.setActions(actions);
+            this.states.add(state);
+            this.binding.put(name, state);
+        }
     }
 
     public void createErrorState(String name, int action) {
@@ -137,7 +143,6 @@ public class App implements NamedElement, Visitable {
         return codeGenerator.getResult();
     }
 
-
     public void loadMorseCode(String path) {
         Gson gson = new Gson();
         try {
@@ -152,12 +157,11 @@ public class App implements NamedElement, Visitable {
 
     }
 
-    public boolean hasALCD(){
-        for(Object o : binding.values()){
-            if(o instanceof Lcd){
-                return true;
-            }
-        }
-        return false;
+    public boolean hasLCD() {
+        return lcds.size() > 0;
+    }
+
+    public List<Lcd> getLcds() {
+        return Collections.unmodifiableList(lcds);
     }
 }
