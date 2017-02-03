@@ -1,12 +1,16 @@
 named Test
 
 connect lcd TOTO on bus 2
+connect led LED on pin 9
 connect button TRIGGER on pin 8
 
-set TOTO on HIGH when switch_on
-set TOTO on LOW when switch_off
+display_on: display "test" on TOTO
+display_off: display "" on TOTO
 
-start on switch_on
+set LED on HIGH when display_off
+set LED on LOW when display_on
 
-when TRIGGER is HIGH then change from switch_off to switch_on
-when TRIGGER is LOW then change from switch_on to switch_off
+start on display_off
+
+when TRIGGER is HIGH then change from display_off to display_on
+when TRIGGER is HIGH then change from display_on to display_off

@@ -1,15 +1,11 @@
 package fr.polytech.dsl.processor.generator;
 
 import fr.polytech.dsl.processor.App;
-import fr.polytech.dsl.processor.behavioral.Action;
-import fr.polytech.dsl.processor.behavioral.Delay;
-import fr.polytech.dsl.processor.behavioral.State;
-import fr.polytech.dsl.processor.behavioral.Transition;
+import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
-
-import java.util.Map;
+import fr.polytech.dsl.processor.structural.actuator.Lcd;
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
@@ -29,20 +25,18 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override public void visit(App app) {
         w("// Wiring code generated from an ArduinoML model");
         w(String.format("// Application name: %s\n", app.getName()));
-        if(app.hasALCD()){
-            w("#include <LiquidCrystal.h> // include a library headfile\n");
-            w("LiquidCrystal lcd(10, 11, 12, 13, 14, 15, 16); //BUS2\n //OR BUS1 values are (2, 3, 4, 5, 6, 7, 8)\n");
+        if (app.hasLCD()) {
+            w("#include <LiquidCrystal.h> // include a library headfile");
+            for (Lcd lcd : app.getLcds()) {
+                if (lcd.getPin() == 2) {
+                    w(String.format("LiquidCrystal %s(10, 11, 12, 13, 14, 15, 16);", lcd.getName()));
+                }
+            }
         }
 
-        w("void setup() {");
+        w("\nvoid setup() {");
         for (Brick brick : app.getBricks()) {
             brick.accept(this);
-        }
-
-        if(app.hasALCD()){
-            w("  // Init LCD\n" +
-                    "  lcd.begin(16, 2);\n" +
-                    "  lcd.clear();");
         }
         w("}\n");
 
@@ -53,16 +47,21 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w("void loop() {");
-        w(String.format("  state_%s();", app.getInitial().getName()));
+        w(String.format("\tstate_%s();", app.getInitial().getName()));
         w("}");
     }
 
     @Override public void visit(Actuator actuator) {
-        w(String.format("  pinMode(%d, OUTPUT); // %s [%s]", actuator.getPin(), actuator.getName(), actuator.getClass().getSimpleName()));
+        w(String.format("\tpinMode(%d, OUTPUT);", actuator.getPin()));
+    }
+
+    @Override public void visit(Lcd lcd) {
+        w(String.format("\t%s.begin(16, 2);", lcd.getName()));
+        w(String.format("\t%s.clear();", lcd.getName()));
     }
 
     @Override public void visit(Sensor sensor) {
-        w(String.format("  pinMode(%d, INPUT);  // %s [Sensor]", sensor.getPin(), sensor.getName()));
+        w(String.format("\tpinMode(%d, INPUT);", sensor.getPin()));
     }
 
     @Override public void visit(State state) {
@@ -79,7 +78,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override public void visit(Transition transition) {
         w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
                 transition.getSensor().getPin(), transition.getValue()));
-        w("\ttime = millis();");
+        w("\t\ttime = millis();");
         w(String.format("\t\tstate_%s();", transition.getNext().getName()));
         w("\t} else {");
         w(String.format("\t\tstate_%s();", ((State) context.get(CURRENT_STATE)).getName()));
@@ -90,14 +89,17 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
     }
 
-    @Override public void visit(Delay delay) {
-        w(String.format("  delay(%d);", delay.getTime()));
+    @Override public void visit(Display display) {
+        if (display.getText().equals("\"\"")) {
+            w(String.format("\t%s.clear();", display.getActuator().getName()));
+        } else {
+            w(String.format("\t%s.clear();", display.getActuator().getName()));
+            w(String.format("\t%s.print(%s);", display.getActuator().getName(), display.getText()));
+        }
     }
 
-    private String toMorse(String toConvert, Map<String, String> conversion){
-        final String[] result = {""};
-        toConvert.chars().forEach(i -> {
-            result[0] += conversion.get(String.valueOf(i));});
-        return result[0];
+    @Override public void visit(Delay delay) {
+        w(String.format("\tdelay(%d);", delay.getTime()));
     }
+
 }
