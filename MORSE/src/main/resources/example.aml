@@ -1,5 +1,5 @@
 connect lcd on bus 2
 
-display "HELLO"
-display "ca marche"
-display "mais je sais pas si on devrait mettre une longueur max"
+emit "HELLO"
+emit "ca marche"
+emit "mais je sais pas si on devrait mettre une longueur max"

@@ -8,7 +8,7 @@ app : connect (display)+ EOF;
 connect : CONNECT LCD ON BUS port=INT;
 
 // display the value on the screen
-display : DISPLAY value=STRING;
+display : EMIT value=STRING;
 
 // Lexer Rules
 // Keywords
@@ -16,7 +16,7 @@ CONNECT : 'connect';
 LCD     : 'lcd';
 ON      : 'on';
 BUS     : 'bus';
-DISPLAY : 'display';
+EMIT    : 'emit';
 
 // Primitives
 INT     : [0-9]+;

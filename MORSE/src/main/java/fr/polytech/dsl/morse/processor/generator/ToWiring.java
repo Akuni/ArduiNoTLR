@@ -2,8 +2,12 @@ package fr.polytech.dsl.morse.processor.generator;
 
 import fr.polytech.dsl.morse.processor.App;
 import fr.polytech.dsl.morse.processor.behavioral.ActionDisplay;
+import fr.polytech.dsl.morse.processor.behavioral.State;
+import fr.polytech.dsl.morse.processor.behavioral.Transition;
 import fr.polytech.dsl.morse.processor.structural.Actuator;
 import fr.polytech.dsl.morse.processor.structural.Brick;
+
+import java.util.Map;
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
@@ -11,6 +15,7 @@ import fr.polytech.dsl.morse.processor.structural.Brick;
 public class ToWiring extends Visitor<StringBuffer> {
 
     private final static String CURRENT_STATE = "current_state";
+    private App app;
 
     public ToWiring() {
         this.result = new StringBuffer();
@@ -21,6 +26,10 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(App app) {
+        this.app = app;
+
+        w("named Morse");
+
         for (Brick brick : app.getBricks()) {
             brick.accept(this);
         }
@@ -37,9 +46,30 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("connect lcd %s on bus %d", actuator.getName(), actuator.getPin()));
     }
 
-    @Override public void visit(ActionDisplay actionDisplay) {
-        w(String.format("display %s on %s in morse", actionDisplay.getMessage(), actionDisplay.getActuator().getName()));
+    @Override
+    public void visit(Transition transition) {
+
     }
 
+    @Override
+    public void visit(State state) {
 
+    }
+
+    @Override public void visit(ActionDisplay actionDisplay) {
+        w(String.format("display %s on %s", toMorse(actionDisplay.getMessage(), app.getMorseConversion()), actionDisplay.getActuator().getName()));
+    }
+
+    private String toMorse(String toConvert, Map<String, String> conversion){
+        final String[] result = {""};
+        toConvert.toUpperCase().chars().forEach(i -> {
+            if(((char)i) == '"'
+                || ((char)i) == ' '){
+                result[0] += String.valueOf((char)i);
+            } else {
+                result[0] += conversion.get(String.valueOf((char) i));
+            }
+        });
+        return result[0];
+    }
 }
