@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import fr.polytech.dsl.morse.processor.behavioral.ActionDisplay;
 import fr.polytech.dsl.morse.processor.behavioral.State;
+import fr.polytech.dsl.morse.processor.behavioral.Transition;
 import fr.polytech.dsl.morse.processor.generator.ToWiring;
 import fr.polytech.dsl.morse.processor.generator.Visitable;
 import fr.polytech.dsl.morse.processor.generator.Visitor;
@@ -28,11 +29,13 @@ public class App implements NamedElement, Visitable {
     private List<Brick> bricks = new ArrayList<>();
     private List<State> states = new ArrayList<>();
     private List<ActionDisplay> displays = new ArrayList<>();
+    private List<Transition> transitions = new ArrayList<>();
 
     //private Map<String, Object> binding = new HashMap<>();
     private Map<String, String> morseConversion = new HashMap<>();
 
     private int stateCount = 0;
+    private int displayCounter = 0;
 
     @Override
     public void accept(Visitor visitor) {
@@ -64,9 +67,11 @@ public class App implements NamedElement, Visitable {
     }
 
     public void createDisplay(String value) {
-        if (bricks.size() > 0)
+        if (bricks.size() > 0) {
             //System.out.println("display \"" + value + "\" on " + ((Actuator) binding.get("LCD")).getName() + " in morse");
-            displays.add(bricks.get(0).getPin(), new ActionDisplay((Actuator) bricks.get(0), value));
+            //displays.add(new ActionDisplay((Actuator) bricks.get(0), value));
+            createDisplayState((Actuator)bricks.get(0), value);
+        }
         // todo : else throw exception
     }
 
@@ -88,6 +93,22 @@ public class App implements NamedElement, Visitable {
         State state = new State();
         state.setName("display_" + stateCount++);
         ActionDisplay display = new ActionDisplay(actuator, valueToDisplay);
+        List<ActionDisplay> l = new ArrayList<>();
+        l.add(display);
+        state.setActions(l);
+        if(states.size() > 0) {
+            Transition t = new Transition();
+            t.setBrick(actuator);
+            t.setCurrent(getLastState());
+            t.setNext(state);
+            getLastState().setTransition(t);
+            transitions.add(t);
+        }
+        states.add(state);
+    }
+
+    private State getLastState(){
+        return states.get(states.size() - 1);
     }
 
 }

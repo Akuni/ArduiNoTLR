@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class Transition implements Visitable {
 
+    private State current;
     private State next;
     private Brick brick;
 
