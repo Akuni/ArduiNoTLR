@@ -2,7 +2,7 @@
 grammar Arduino;
 
 // Parser Rules
-app      : named (connect)+ (set | display)+ start (when)+ EOF;
+app      : named (connect)+ (set | display)+ start (when)+ (excep)* EOF;
 
 named    : NAMED name=NAME;
 
@@ -13,6 +13,8 @@ set      : SET ac=ID ON val=ID WHEN state=LABEL;
 start    : START ON state=LABEL;
 
 when     : WHEN sensor=ID IS val=ID THEN CHANGE FROM from=LABEL TO to=LABEL;
+
+excep    : THROW EXCEPTION eid=INT ON state=LABEL WHEN sensor=ID IS v=ID;
 
 // static version
 // display on  LEC   "TEST"
@@ -45,6 +47,8 @@ DISPLAY : 'display';
 IN      : 'in';
 TOGGLE  : 'toggle';
 MORSE   : 'morse';
+THROW   : 'throw';
+EXCEPTION: 'exception';
 
 // Primitives
 TRUE    : 'true';

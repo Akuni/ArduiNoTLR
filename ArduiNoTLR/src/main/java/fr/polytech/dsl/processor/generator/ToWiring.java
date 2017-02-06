@@ -66,12 +66,16 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override public void visit(State state) {
         w(String.format("void state_%s() {", state.getName()));
+        if(state.getTransExcept() != null)
+            state.getTransExcept().accept(this);
         for (Action action : state.getActions()) {
             action.accept(this);
         }
         w("\tboolean guard = millis() - time > debounce;");
         context.put(CURRENT_STATE, state);
-        state.getTransition().accept(this);
+        System.out.println(state.getName());
+        if(state.getTransition() != null)
+            state.getTransition().accept(this);
         w("}\n");
     }
 
@@ -100,6 +104,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override public void visit(Delay delay) {
         w(String.format("\tdelay(%d);", delay.getTime()));
+    }
+
+    @Override
+    public void visit(TransExcept transExcept) {
+        w(String.format("\tif(digitalRead(%s) == %s && guard){", transExcept.getSensor().getName(), transExcept.getValue()));
+        w(String.format("\t\twhile(1) { state_%s(); }", transExcept.getNext().getName()));
+        w("\t}");
     }
 
 }

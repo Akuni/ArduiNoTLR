@@ -29,7 +29,7 @@ public class App implements NamedElement, Visitable {
     private final int MIN_ALPHABET_SIZE = 26;
     private final String LETTER_LABEL = "letter";
     private final String CODE_LABEL = "code";
-    private int DEFAULT_ERROR_PIN = 12;
+    private final int DEFAULT_ERROR_PIN = 8;
 
     private String name;
     private List<Brick> bricks = new ArrayList<>();
@@ -85,7 +85,7 @@ public class App implements NamedElement, Visitable {
         }
     }
 
-    public void createErrorState(String name, int action) {
+    public State createErrorState(String name, int action) {
         // error led on pin 12
         Led errorLed = new Led();
         errorLed.setName("error");
@@ -95,29 +95,39 @@ public class App implements NamedElement, Visitable {
         State errorState = new State();
         errorState.setName(name);
 
-        List<Action> actions = new ArrayList<>();
         // default led ON
         Action errorLedON = new Action();
         errorLedON.setActuator(errorLed);
         errorLedON.setValue(Signal.HIGH);
 
         Delay delay = new Delay();
-        delay.setTime(500);
+        delay.setTime(250);
+
+        Delay longDelay = new Delay();
+        longDelay.setTime(2000);
 
         Action errorLedOFF = new Action();
         errorLedOFF.setActuator(errorLed);
         errorLedOFF.setValue(Signal.LOW);
 
 
-        actions.add(errorLedON);
-        actions.add(delay);
-        actions.add(errorLedOFF);
-        actions.add(delay);
+        List<Action> actions = new ArrayList<>();
+        for(int i = 0 ; i < action ; i++){
+
+            actions.add(errorLedON);
+            actions.add(delay);
+            actions.add(errorLedOFF);
+            actions.add(delay);
+        }
+
+        actions.add(longDelay);
+
 
         errorState.setActions(actions);
 
         this.states.add(errorState);
         this.binding.put(name, errorState);
+        return errorState;
     }
 
     public void createTransition(State from, State to, Sensor sensor, Signal value) {
@@ -164,4 +174,17 @@ public class App implements NamedElement, Visitable {
     public List<Lcd> getLcds() {
         return Collections.unmodifiableList(lcds);
     }
+
+    public void createException(String sensorLabel, int eid, String value, String stateLabel) {
+        State error = createErrorState("error_" + eid, eid);
+        final Sensor[] sensor = {null};
+        bricks.stream().filter(b -> sensorLabel.equals(b.getName())).forEach(b -> {
+            sensor[0] = (Sensor) b;
+        });
+        states.stream().filter(s -> stateLabel.equals(s.getName())).forEach(s -> {
+            s.injectException(error, sensor[0], value);
+        });
+    }
+
+
 }

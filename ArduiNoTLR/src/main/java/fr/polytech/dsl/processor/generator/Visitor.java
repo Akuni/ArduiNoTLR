@@ -29,6 +29,8 @@ public abstract class Visitor<T> {
 
     public abstract void visit(Delay delay);
 
+    public abstract void visit(TransExcept transExcept);
+
 
     Map<String, Object> context = new HashMap<>();
 

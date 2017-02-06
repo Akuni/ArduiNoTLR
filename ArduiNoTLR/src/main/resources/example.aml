@@ -14,3 +14,5 @@ start on display_off
 
 when TRIGGER is HIGH then change from display_off to display_on
 when TRIGGER is HIGH then change from display_on to display_off
+
+throw exception 4 on display_off when TRIGGER is HIGH

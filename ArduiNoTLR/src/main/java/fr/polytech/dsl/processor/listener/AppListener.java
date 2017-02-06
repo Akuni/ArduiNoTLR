@@ -2,6 +2,7 @@ package fr.polytech.dsl.processor.listener;
 
 import com.google.common.collect.Maps;
 import fr.polytech.dsl.language.ArduinoBaseListener;
+import fr.polytech.dsl.language.ArduinoParser;
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.Action;
 import fr.polytech.dsl.processor.behavioral.Delay;
@@ -89,6 +90,17 @@ public class AppListener extends ArduinoBaseListener {
         Delay delay = new Delay();
         delay.setTime(100);
         app.createState(ctx.state.getText(), Arrays.asList(action, delay));
+    }
+
+    @Override  public void exitExcep(ExcepContext ctx) throws IllegalArgumentException{
+        if(ctx.sensor != null && ctx.eid != null && ctx.v != null && ctx.state != null){
+            app.createException(ctx.sensor.getText(),
+                    Integer.parseInt(ctx.eid.getText()),
+                    ctx.v.getText(),
+                    ctx.state.getText());
+        } else {
+            throw new IllegalArgumentException("Malformed exception");
+        }
     }
 
 }
