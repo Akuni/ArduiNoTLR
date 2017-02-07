@@ -12,7 +12,7 @@ set      : SET ac=ID ON val=ID WHEN state=LABEL;
 
 start    : START ON state=LABEL;
 
-when     : WHEN sensor=ID IS val=ID THEN CHANGE FROM from=LABEL TO to=LABEL;
+when     : (WHEN sensor=ID IS val=ID THEN)? CHANGE FROM from=LABEL TO to=LABEL;
 
 excep    : THROW EXCEPTION eid=INT ON state=LABEL WHEN sensor=ID IS v=ID;
 
@@ -55,10 +55,10 @@ TRUE    : 'true';
 FALSE   : 'false';
 INT     : [0-9]+;
 DEC     : INT '.' INT;
-STRING  : '"'[a-zA-Z0-9_ ]*'"';
+STRING  : '"'[a-zA-Z0-9_ .-]*'"';
 ID      : [A-Z_]+;
 NAME    : [A-Z][a-zA-Z_]+;
-LABEL   : [a-z][a-z_]+;
+LABEL   : [a-z][a-z0-9_]+;
 
 // Skip spaces, tabs, newlines
 WS      : [ \r\n]+ -> skip;

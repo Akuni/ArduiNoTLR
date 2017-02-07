@@ -1,0 +1,12 @@
+named Morse
+connect lcd LCD on bus 2
+
+
+display_0: display "......-...-..---" on LCD
+display_1: display "-.-..- --.-.-.-.-......" on LCD
+display_2: display "--.-..... .---. ....-..... .--..-... ..... ----. -......-.-..-..- --.--.-.. ..--.. .-..----.--...-...-.-. --.--..-" on LCD
+
+
+start on display_0
+change from display_0 to display_1
+change from display_1 to display_2

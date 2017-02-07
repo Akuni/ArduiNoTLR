@@ -46,8 +46,13 @@ public class AppListener extends ArduinoBaseListener {
     @Override public void exitWhen(WhenContext ctx) {
         State from = app.getBinding(ctx.from.getText(), State.class);
         State to = app.getBinding(ctx.to.getText(), State.class);
-        Sensor sensor = app.getBinding(ctx.sensor.getText(), Sensor.class);
-        app.createTransition(from, to, sensor, Signal.valueOf(ctx.val.getText()));
+        if(ctx.sensor != null && ctx.val != null) {
+            Sensor sensor = app.getBinding(ctx.sensor.getText(), Sensor.class);
+            app.createTransition(from, to, sensor, Signal.valueOf(ctx.val.getText()));
+        } else {
+            app.createTransition(from, to, null, null);
+        }
+
     }
 
     @Override public void exitStart(StartContext ctx) {
@@ -88,7 +93,7 @@ public class AppListener extends ArduinoBaseListener {
         action.setActuator(lcd);
         action.setText(ctx.value.getText());
         Delay delay = new Delay();
-        delay.setTime(100);
+        delay.setTime(2000);
         app.createState(ctx.state.getText(), Arrays.asList(action, delay));
     }
 

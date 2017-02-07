@@ -2,10 +2,7 @@ package fr.polytech.dsl.processor;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import fr.polytech.dsl.processor.behavioral.Action;
-import fr.polytech.dsl.processor.behavioral.Delay;
-import fr.polytech.dsl.processor.behavioral.State;
-import fr.polytech.dsl.processor.behavioral.Transition;
+import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.generator.ToWiring;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;

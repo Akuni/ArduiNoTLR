@@ -73,15 +73,20 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
         w("\tboolean guard = millis() - time > debounce;");
         context.put(CURRENT_STATE, state);
-        System.out.println(state.getName());
         if(state.getTransition() != null)
             state.getTransition().accept(this);
         w("}\n");
     }
 
     @Override public void visit(Transition transition) {
-        w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
-                transition.getSensor().getPin(), transition.getValue()));
+        if(transition.getSensor() == null){
+            w(String.format("\tstate_%s();", transition.getNext().getName()));
+            return;
+        } else {
+            w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
+                    transition.getSensor().getPin(), transition.getValue()));
+        }
+
         w("\t\ttime = millis();");
         w(String.format("\t\tstate_%s();", transition.getNext().getName()));
         w("\t} else {");
@@ -108,7 +113,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(TransExcept transExcept) {
-        w(String.format("\tif(digitalRead(%s) == %s && guard){", transExcept.getSensor().getName(), transExcept.getValue()));
+        w(String.format("\tif(digitalRead(%s) == %s){", transExcept.getSensor().getPin(), transExcept.getValue()));
         w(String.format("\t\twhile(1) { state_%s(); }", transExcept.getNext().getName()));
         w("\t}");
     }
