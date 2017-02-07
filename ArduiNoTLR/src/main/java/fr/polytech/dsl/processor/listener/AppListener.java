@@ -84,6 +84,21 @@ public class AppListener extends ArduinoBaseListener {
             case "button":
                 app.createSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
                 break;
+            case "thermo":
+                app.createThermoSensor(ctx.cpt.getText(), Integer.parseInt(ctx.port.getText()));
+                break;
+        }
+    }
+
+    @Override
+    public void exitMonitor(MonitorContext ctx) {
+        Sensor sensor = app.getBinding(ctx.sensor.getText(), Sensor.class);
+        Lcd lcd = app.getLcd(ctx.lcd.getText());
+
+        if(sensor != null && lcd != null){
+            app.createMonitor(sensor, lcd);
+        } else {
+            throw new IllegalArgumentException("Malformed monitor");
         }
     }
 

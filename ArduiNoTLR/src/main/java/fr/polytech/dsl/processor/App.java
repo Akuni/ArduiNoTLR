@@ -11,6 +11,7 @@ import fr.polytech.dsl.processor.model.NamedElement;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.Signal;
+import fr.polytech.dsl.processor.structural.ThermoSensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
 import fr.polytech.dsl.processor.structural.actuator.Lcd;
 import fr.polytech.dsl.processor.structural.actuator.Led;
@@ -34,6 +35,7 @@ public class App implements NamedElement, Visitable {
     private List<Lcd> lcds = new ArrayList<>();
     private State initial;
     private Map<String, String> morseConversion = new HashMap<>();
+    private Monitor monitor;
 
     private Map<String, Object> binding = new HashMap<>();
 
@@ -43,6 +45,14 @@ public class App implements NamedElement, Visitable {
 
     public void createSensor(String name, Integer pinNumber) {
         Sensor sensor = new Sensor();
+        sensor.setName(name);
+        sensor.setPin(pinNumber);
+        this.bricks.add(sensor);
+        this.binding.put(name, sensor);
+    }
+
+    public void createThermoSensor(String name, Integer pinNumber) {
+        ThermoSensor sensor = new ThermoSensor();
         sensor.setName(name);
         sensor.setPin(pinNumber);
         this.bricks.add(sensor);
@@ -172,6 +182,10 @@ public class App implements NamedElement, Visitable {
         return Collections.unmodifiableList(lcds);
     }
 
+    public Lcd getLcd(String name) {
+        return lcds.stream().filter((n) -> n.getName().equals(name)).findFirst().orElse(null);
+    }
+
     public void createException(String sensorLabel, int eid, String value, String stateLabel) {
         State error = createErrorState("error_" + eid, eid);
         final Sensor[] sensor = {null};
@@ -183,5 +197,7 @@ public class App implements NamedElement, Visitable {
         });
     }
 
-
+    public void createMonitor(Sensor sensor, Lcd lcd) {
+        this.monitor = new Monitor(sensor, lcd);
+    }
 }

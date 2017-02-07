@@ -4,6 +4,7 @@ import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
+import fr.polytech.dsl.processor.structural.ThermoSensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
 import fr.polytech.dsl.processor.structural.actuator.Lcd;
 
@@ -32,6 +33,8 @@ public class ToWiring extends Visitor<StringBuffer> {
                     w(String.format("LiquidCrystal %s(10, 11, 12, 13, 14, 15, 16);", lcd.getName()));
                 }
             }
+            w("\n#define LCD_CHAR_CELSIUS 0");
+            w("uint8_t celsiusChar[8] = {0x8,0xf4,0x8,0x43,0x4,0x4,0x43,0x0};"); // <3
         }
 
         w("\nvoid setup() {");
@@ -39,6 +42,10 @@ public class ToWiring extends Visitor<StringBuffer> {
             brick.accept(this);
         }
         w("}\n");
+
+        if(app.getMonitor() != null) {
+            app.getMonitor().accept(this);
+        }
 
         w("long time = 0; long debounce = 200;\n");
 
@@ -57,6 +64,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override public void visit(Lcd lcd) {
         w(String.format("\t%s.begin(16, 2);", lcd.getName()));
+        w(String.format("\t%s.createChar(LCD_CHAR_CELSIUS, celsiusChar);", lcd.getName()));
         w(String.format("\t%s.clear();", lcd.getName()));
     }
 
@@ -118,4 +126,31 @@ public class ToWiring extends Visitor<StringBuffer> {
         w("\t}");
     }
 
+    @Override
+    public void visit(Monitor monitor) {
+        if(monitor == null) return;
+        w("void monitor() {");
+
+        Sensor sensor = monitor.getSensor();
+        String lcdName = monitor.getLcd().getName();
+
+        if(sensor instanceof ThermoSensor) {
+            w(String.format("\tint a = analogRead(%s);", sensor.getPin()));
+            w("\tfloat R = 1023.0/((float)a)-1.0;");
+            w("\tR = 100000.0*R;");
+            w("\tfloat temperature = 1.0/(log(R/100000.0)/B+1/298.15)-273.15;");
+
+            w(String.format("\t%s.setCursor(9, 1);", lcdName));
+            w(String.format("\tif(temperature > -10 && temperature < 10) %s.print(\" \");", lcdName));
+            w(String.format("\tif(temperature >= 0) %s.print(\"+\");", lcdName));
+            w(String.format("\t%s.print(String(temperature));", lcdName));
+            w(String.format("\t%s.print((char) LCD_CHAR_CELSIUS);", lcdName));
+        }
+        else {
+            w(String.format("\tint value = digitalRead(%d);", sensor.getPin()));
+            w(String.format("\t%s.setCursor(13, 1);", lcdName));
+            w(String.format("\t%s.print(value ? \" ON\" : \"OFF\");", lcdName));
+        }
+        w("}\n");
+    }
 }

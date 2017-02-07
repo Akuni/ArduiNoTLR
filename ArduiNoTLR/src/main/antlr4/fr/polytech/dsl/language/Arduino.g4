@@ -2,11 +2,13 @@
 grammar Arduino;
 
 // Parser Rules
-app      : named (connect)+ (set | display)+ start (when)+ (excep)* EOF;
+app      : named (connect)+ (monitor)? (set | display)+ start (when)+ (excep)* EOF;
 
 named    : NAMED name=NAME;
 
 connect  : CONNECT ac=actuator cpt=ID ON fcd=facade port=INT;
+
+monitor  : MONITOR sensor=ID ON lcd=ID;
 
 set      : SET ac=ID ON val=ID WHEN state=LABEL;
 
@@ -20,7 +22,7 @@ excep    : THROW EXCEPTION eid=INT ON state=LABEL WHEN sensor=ID IS v=ID;
 // display on  LEC   "TEST"
 display  : state=LABEL':' DISPLAY value=STRING ON cpt=ID;
 
-actuator : LED | BUTTON | LCD;
+actuator : LED | BUTTON | LCD | THERMO;
 facade   : PIN | BUS;
 
 // Lexer Rules
@@ -28,10 +30,12 @@ facade   : PIN | BUS;
 // Keywords
 NAMED   : 'named';
 CONNECT : 'connect';
+MONITOR : 'monitor';
 SET     : 'set';
 LED     : 'led';
 START   : 'start';
 LCD     : 'lcd';
+THERMO  : 'thermo';
 THEN    : 'then';
 CHANGE  : 'change';
 FROM    : 'from';
@@ -61,7 +65,8 @@ NAME    : [A-Z][a-zA-Z_]+;
 LABEL   : [a-z][a-z0-9_]+;
 
 // Skip spaces, tabs, newlines
-WS      : [ \r\n]+ -> skip;
+WS      : [ \r\n]+       -> skip;
+COMMENT : '//' ~('\n')*  -> skip;
 
 /*
 named ArduinoML

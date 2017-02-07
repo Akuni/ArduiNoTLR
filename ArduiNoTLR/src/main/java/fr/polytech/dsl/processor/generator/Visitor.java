@@ -3,6 +3,7 @@ package fr.polytech.dsl.processor.generator;
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.structural.Sensor;
+import fr.polytech.dsl.processor.structural.ThermoSensor;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
 import fr.polytech.dsl.processor.structural.actuator.Lcd;
 
@@ -14,6 +15,8 @@ public abstract class Visitor<T> {
     public abstract void visit(App app);
 
     public abstract void visit(State state);
+
+    public abstract void visit(Monitor monitor);
 
     public abstract void visit(Transition transition);
 
