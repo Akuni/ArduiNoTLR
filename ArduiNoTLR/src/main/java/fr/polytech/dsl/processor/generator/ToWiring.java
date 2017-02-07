@@ -43,9 +43,11 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
         w("}\n");
 
+        w("void monitor() {");
         if(app.getMonitor() != null) {
             app.getMonitor().accept(this);
         }
+        w("}\n");
 
         w("long time = 0; long debounce = 200;\n");
 
@@ -74,6 +76,8 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override public void visit(State state) {
         w(String.format("void state_%s() {", state.getName()));
+        w("\tmonitor();");
+
         if(state.getTransExcept() != null)
             state.getTransExcept().accept(this);
         for (Action action : state.getActions()) {
@@ -81,8 +85,9 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
         w("\tboolean guard = millis() - time > debounce;");
         context.put(CURRENT_STATE, state);
-        if(state.getTransition() != null)
+        if(state.getTransition() != null) {
             state.getTransition().accept(this);
+        }
         w("}\n");
     }
 
@@ -128,9 +133,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Monitor monitor) {
-        if(monitor == null) return;
-        w("void monitor() {");
-
         Sensor sensor = monitor.getSensor();
         String lcdName = monitor.getLcd().getName();
 
@@ -151,6 +153,5 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("\t%s.setCursor(13, 1);", lcdName));
             w(String.format("\t%s.print(value ? \" ON\" : \"OFF\");", lcdName));
         }
-        w("}\n");
     }
 }
