@@ -61,7 +61,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Transition transition) {
-        w(String.format("when %s is %s then change from %s to %s", String.valueOf(true), String.valueOf(true), transition.getCurrent().getName(), transition.getNext().getName()));
+        w(String.format("change from %s to %s", transition.getCurrent().getName(), transition.getNext().getName()));
     }
 
     @Override
