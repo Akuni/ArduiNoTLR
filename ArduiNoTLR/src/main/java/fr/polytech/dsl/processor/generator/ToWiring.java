@@ -143,7 +143,7 @@ public class ToWiring extends Visitor<StringBuffer> {
         String lcdName = monitor.getLcd().getName();
 
         if(sensor instanceof ThermoSensor) {
-            w(String.format("\tint a = analogRead(%s);", sensor.getPin()));
+            w(String.format("\tint a = analogRead(A%s);", sensor.getPin()));
             w("\tint B = 4275;");
             w("\tfloat R = 1023.0/((float)a)-1.0;");
             w("\tR = 100000.0*R;");
