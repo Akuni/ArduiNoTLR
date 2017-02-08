@@ -1,12 +1,9 @@
 package fr.polytech.dsl.processor;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import fr.polytech.dsl.processor.behavioral.*;
 import fr.polytech.dsl.processor.generator.ToWiring;
 import fr.polytech.dsl.processor.generator.Visitable;
 import fr.polytech.dsl.processor.generator.Visitor;
-import fr.polytech.dsl.processor.model.MorseRepresentation;
 import fr.polytech.dsl.processor.model.NamedElement;
 import fr.polytech.dsl.processor.structural.Brick;
 import fr.polytech.dsl.processor.structural.Sensor;
@@ -17,8 +14,6 @@ import fr.polytech.dsl.processor.structural.actuator.Lcd;
 import fr.polytech.dsl.processor.structural.actuator.Led;
 import lombok.Data;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.*;
 
 @Data
@@ -34,7 +29,6 @@ public class App implements NamedElement, Visitable {
     private List<State> states = new ArrayList<>();
     private List<Lcd> lcds = new ArrayList<>();
     private State initial;
-    private Map<String, String> morseConversion = new HashMap<>();
     private Monitor monitor;
 
     private Map<String, Object> binding = new HashMap<>();
@@ -119,7 +113,7 @@ public class App implements NamedElement, Visitable {
 
 
         List<Action> actions = new ArrayList<>();
-        for(int i = 0 ; i < action ; i++){
+        for (int i = 0; i < action; i++) {
 
             actions.add(errorLedON);
             actions.add(delay);
@@ -138,11 +132,16 @@ public class App implements NamedElement, Visitable {
     }
 
     public void createTransition(State from, State to, Sensor sensor, Signal value) {
-        Transition transition = new Transition();
-        transition.setNext(to);
+        Transition transition = createTransition(from, to);
         transition.setSensor(sensor);
         transition.setValue(value);
+    }
+
+    public Transition createTransition(State from, State to) {
+        Transition transition = new Transition();
+        transition.setNext(to);
         from.setTransition(transition);
+        return transition;
     }
 
     public <T> T getBinding(String name, Class<T> type) {
@@ -150,28 +149,10 @@ public class App implements NamedElement, Visitable {
         return object != null ? type.cast(object) : null;
     }
 
-    public Object getBinding(String name) {
-        return getBinding(name, Object.class);
-    }
-
     Object generateCode() {
         Visitor codeGenerator = new ToWiring();
         accept(codeGenerator);
         return codeGenerator.getResult();
-    }
-
-    public void loadMorseCode(String path) {
-        Gson gson = new Gson();
-        try {
-            JsonReader reader = new JsonReader(new FileReader(path));
-            MorseRepresentation[] data = gson.fromJson(reader, MorseRepresentation[].class);
-            for (MorseRepresentation mc : data) {
-                morseConversion.put(mc.getLetter(), mc.getCode());
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public boolean hasLCD() {

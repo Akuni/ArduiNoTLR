@@ -29,8 +29,14 @@ public class ToWiring extends Visitor<StringBuffer> {
         if (app.hasLCD()) {
             w("#include <LiquidCrystal.h> // include a library headfile");
             for (Lcd lcd : app.getLcds()) {
-                if (lcd.getPin() == 2) {
-                    w(String.format("LiquidCrystal %s(10, 11, 12, 13, 14, 15, 16);", lcd.getName()));
+                // This represent a bus for a LCD
+                switch (lcd.getPin()) {
+                    case 1:
+                        w(String.format("LiquidCrystal %s(2, 3, 4, 5, 6, 7, 8);", lcd.getName()));
+                        break;
+                    case 2:
+                        w(String.format("LiquidCrystal %s(10, 11, 12, 13, 14, 15, 16);", lcd.getName()));
+                        break;
                 }
             }
             w("\n#define LCD_CHAR_CELSIUS 0");
@@ -91,19 +97,17 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
         w("\tboolean guard = millis() - time > debounce;");
         context.put(CURRENT_STATE, state);
-        if(state.getTransition() != null) {
-            state.getTransition().accept(this);
-        }
+
+        state.getTransition().accept(this);
         w("}\n");
     }
 
     @Override public void visit(Transition transition) {
-        if(transition.getSensor() == null){
+        if (transition.getSensor() == null) {
             w(String.format("\tstate_%s();", transition.getNext().getName()));
             return;
         } else {
-            w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
-                    transition.getSensor().getPin(), transition.getValue()));
+            w(String.format("\tif (digitalRead(%d) == %s && guard) {", transition.getSensor().getPin(), transition.getValue()));
         }
 
         w("\t\ttime = millis();");
@@ -133,7 +137,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override
     public void visit(TransExcept transExcept) {
         w(String.format("\tif(digitalRead(%s) == %s){", transExcept.getSensor().getPin(), transExcept.getValue()));
-        w(String.format("\t\twhile(1) { state_%s(); }", transExcept.getNext().getName()));
+        w(String.format("\t\tstate_%s();", transExcept.getNext().getName()));
         w("\t}");
     }
 
