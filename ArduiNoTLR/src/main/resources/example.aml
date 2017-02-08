@@ -1,18 +1,13 @@
-named Test
+named Morse
+connect lcd LCD on bus 2
 
-connect lcd TOTO on bus 2
-connect led LED on pin 8
-connect button TRIGGER on pin 9
 
-display_on: display "ON" on TOTO
-display_off: display "OFF" on TOTO
+display_0: display "......-...-..---" on LCD
+display_1: display "-.-..- --.-.-.-.-......" on LCD
+display_2: display "--.-..... .---. ....-..... .--..-... ..... ----. -......-.-..-..- --.--.-.. ..--.. .-..----.--...-...-.-. --.--..-" on LCD
 
-set LED on HIGH when display_off
-set LED on LOW when display_on
 
-start on display_off
-
-change from display_off to display_on
-change from display_on to display_off
-
-throw exception 4 on display_off when TRIGGER is HIGH
+start on display_0
+change from display_0 to display_1
+change from display_1 to display_2
+change from display_2 to display_0

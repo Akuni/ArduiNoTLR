@@ -17,8 +17,12 @@ public class State implements NamedElement, Visitable {
     private Transition transition;
     private TransExcept transExcept;
 
+    public State() {
+        transition = new Transition();
+        transition.setNext(this);
+    }
 
-    public void injectException(State errorState, Sensor sensor, String value){
+    public void injectException(State errorState, Sensor sensor, String value) {
         transExcept = new TransExcept(errorState, sensor, value);
 
     }

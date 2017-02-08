@@ -1,8 +1,6 @@
 package fr.polytech.dsl.processor.listener;
 
-import com.google.common.collect.Maps;
 import fr.polytech.dsl.language.ArduinoBaseListener;
-import fr.polytech.dsl.language.ArduinoParser;
 import fr.polytech.dsl.processor.App;
 import fr.polytech.dsl.processor.behavioral.Action;
 import fr.polytech.dsl.processor.behavioral.Delay;
@@ -11,27 +9,16 @@ import fr.polytech.dsl.processor.behavioral.State;
 import fr.polytech.dsl.processor.structural.Sensor;
 import fr.polytech.dsl.processor.structural.Signal;
 import fr.polytech.dsl.processor.structural.actuator.Actuator;
-import fr.polytech.dsl.processor.structural.actuator.Buzzer;
 import fr.polytech.dsl.processor.structural.actuator.Lcd;
-import fr.polytech.dsl.processor.structural.actuator.Led;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 
 import static fr.polytech.dsl.language.ArduinoParser.*;
 
 public class AppListener extends ArduinoBaseListener {
-
-    private static final Map<String, Class<?>> classBinding = Maps.newHashMap();
-
-    static {
-        classBinding.put("led", Led.class);
-        classBinding.put("buzzer", Buzzer.class);
-        classBinding.put("lcd", Lcd.class);
-    }
 
     @Getter private App app;
 
@@ -46,13 +33,12 @@ public class AppListener extends ArduinoBaseListener {
     @Override public void exitWhen(WhenContext ctx) {
         State from = app.getBinding(ctx.from.getText(), State.class);
         State to = app.getBinding(ctx.to.getText(), State.class);
-        if(ctx.sensor != null && ctx.val != null) {
+        if (ctx.sensor != null && ctx.val != null) {
             Sensor sensor = app.getBinding(ctx.sensor.getText(), Sensor.class);
             app.createTransition(from, to, sensor, Signal.valueOf(ctx.val.getText()));
         } else {
-            app.createTransition(from, to, null, null);
+            app.createTransition(from, to);
         }
-
     }
 
     @Override public void exitStart(StartContext ctx) {
@@ -97,8 +83,8 @@ public class AppListener extends ArduinoBaseListener {
         app.createState(ctx.state.getText(), Arrays.asList(action, delay));
     }
 
-    @Override  public void exitExcep(ExcepContext ctx) throws IllegalArgumentException{
-        if(ctx.sensor != null && ctx.eid != null && ctx.v != null && ctx.state != null){
+    @Override public void exitExcep(ExcepContext ctx) throws IllegalArgumentException {
+        if (ctx.sensor != null && ctx.eid != null && ctx.v != null && ctx.state != null) {
             app.createException(ctx.sensor.getText(),
                     Integer.parseInt(ctx.eid.getText()),
                     ctx.v.getText(),
