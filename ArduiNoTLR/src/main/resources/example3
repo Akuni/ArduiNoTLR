@@ -3,6 +3,9 @@ named Test
 connect lcd TOTO on bus 2
 connect led LED on pin 8
 connect button TRIGGER on pin 9
+connect thermo THERMO on pin 1
+
+monitor THERMO on TOTO
 
 display_on: display "ON" on TOTO
 display_off: display "OFF" on TOTO
@@ -14,3 +17,5 @@ start on display_off
 
 change from display_off to display_on
 change from display_on to display_off
+
+throw exception 4 on display_off when TRIGGER is HIGH
