@@ -61,7 +61,10 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Actuator actuator) {
-        w(String.format("\tpinMode(%d, OUTPUT);", actuator.getPin()));
+        if(actuator.getPin() < 8)
+            w(String.format("\tpinMode(A%d, OUTPUT);", actuator.getPin()));
+        else
+            w(String.format("\tpinMode(%d, OUTPUT);", actuator.getPin()));
     }
 
     @Override public void visit(Lcd lcd) {
@@ -71,7 +74,10 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Sensor sensor) {
-        w(String.format("\tpinMode(%d, INPUT);", sensor.getPin()));
+        if(sensor.getPin() < 8)
+            w(String.format("\tpinMode(A%d, INPUT);", sensor.getPin()));
+        else
+            w(String.format("\tpinMode(%d, INPUT);", sensor.getPin()));
     }
 
     @Override public void visit(State state) {
@@ -138,6 +144,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         if(sensor instanceof ThermoSensor) {
             w(String.format("\tint a = analogRead(%s);", sensor.getPin()));
+            w("\tint B = 4275;");
             w("\tfloat R = 1023.0/((float)a)-1.0;");
             w("\tR = 100000.0*R;");
             w("\tfloat temperature = 1.0/(log(R/100000.0)/B+1/298.15)-273.15;");
