@@ -77,7 +77,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Sensor sensor) {
-        w(String.format("\tpinMode(%s, OUTPUT);", sensor.getActualPin()));
+        w(String.format("\tpinMode(%s, INPUT);", sensor.getActualPin()));
     }
 
     @Override public void visit(State state) {
@@ -118,9 +118,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Display display) {
-        if (display.getText().equals("\"\"")) {
-            w(String.format("\t%s.clear();", display.getActuator().getName()));
-        } else {
+        if (!display.getText().equals("\"\"")) {
             w(String.format("\t%s.clear();", display.getActuator().getName()));
             w(String.format("\t%s.print(%s);", display.getActuator().getName(), display.getText()));
         }

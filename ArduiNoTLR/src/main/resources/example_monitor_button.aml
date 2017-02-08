@@ -1,0 +1,10 @@
+named Test
+
+connect lcd TOTO on bus 2
+connect button BTN on pin 9
+
+monitor BTN on TOTO
+
+useless: display "" on TOTO
+
+start on useless

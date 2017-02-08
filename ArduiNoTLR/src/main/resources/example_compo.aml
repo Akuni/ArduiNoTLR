@@ -1,0 +1,19 @@
+named Test
+
+//connect lcd TOTO on bus 2
+connect led LED  on pin 8
+connect led LEDL on pin 12
+connect button TRIGGER on pin 9
+
+//display_on: display "ON" on TOTO
+//display_off: display "OFF" on TOTO
+
+set LED  on LOW  when display_off
+set LED  on HIGH when display_on
+set LEDL on LOW  when display_off
+set LEDL on HIGH when display_on
+
+start on display_off
+
+when TRIGGER is HIGH then change from display_off to display_on
+when TRIGGER is HIGH then change from display_on to display_off

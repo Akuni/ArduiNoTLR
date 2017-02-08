@@ -20,7 +20,7 @@ public class ArduiNoTLR {
      * @throws Exception something goes wrong.
      */
     public static void main(String... args) throws Exception {
-        App app = create(ArduiNoTLR.class.getResourceAsStream("/example.aml"));
+        App app = create(ArduiNoTLR.class.getResourceAsStream("/example_lcd.aml"));
         System.out.println(app.generateCode());
     }
 

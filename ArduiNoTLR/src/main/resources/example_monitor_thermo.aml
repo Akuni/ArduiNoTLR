@@ -1,0 +1,10 @@
+named Test
+
+connect lcd TOTO on bus 2
+connect thermo THERMO on pin 5
+
+monitor THERMO on TOTO
+
+useless: display "" on TOTO
+
+start on useless

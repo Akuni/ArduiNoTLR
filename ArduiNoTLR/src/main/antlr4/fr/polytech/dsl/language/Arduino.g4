@@ -2,7 +2,7 @@
 grammar Arduino;
 
 // Parser Rules
-app      : named (connect)+ (monitor)? (set | display)+ start (when)+ (excep)* EOF;
+app      : named (connect)+ (monitor)? (set | display)+ start (when)* (excep)* EOF;
 
 named    : NAMED name=NAME;
 
