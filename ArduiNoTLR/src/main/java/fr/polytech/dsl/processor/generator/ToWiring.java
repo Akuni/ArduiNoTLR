@@ -61,10 +61,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Actuator actuator) {
-        if(actuator.getPin() < 8)
-            w(String.format("\tpinMode(A%d, OUTPUT);", actuator.getPin()));
-        else
-            w(String.format("\tpinMode(%d, OUTPUT);", actuator.getPin()));
+        w(String.format("\tpinMode(%s, OUTPUT);", actuator.getActualPin()));
     }
 
     @Override public void visit(Lcd lcd) {
@@ -74,10 +71,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Sensor sensor) {
-        if(sensor.getPin() < 8)
-            w(String.format("\tpinMode(A%d, INPUT);", sensor.getPin()));
-        else
-            w(String.format("\tpinMode(%d, INPUT);", sensor.getPin()));
+        w(String.format("\tpinMode(%s, OUTPUT);", sensor.getActualPin()));
     }
 
     @Override public void visit(State state) {
@@ -102,8 +96,8 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("\tstate_%s();", transition.getNext().getName()));
             return;
         } else {
-            w(String.format("\tif( digitalRead(%d) == %s && guard ) {",
-                    transition.getSensor().getPin(), transition.getValue()));
+            w(String.format("\tif( digitalRead(%s) == %s && guard ) {",
+                    transition.getSensor().getActualPin(), transition.getValue()));
         }
 
         w("\t\ttime = millis();");
@@ -114,7 +108,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override public void visit(Action action) {
-        w(String.format("\tdigitalWrite(%d,%s);", action.getActuator().getPin(), action.getValue()));
+        w(String.format("\tdigitalWrite(%s,%s);", action.getActuator().getActualPin(), action.getValue()));
     }
 
     @Override public void visit(Display display) {
@@ -132,7 +126,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(TransExcept transExcept) {
-        w(String.format("\tif(digitalRead(%s) == %s){", transExcept.getSensor().getPin(), transExcept.getValue()));
+        w(String.format("\tif(digitalRead(%s) == %s){", transExcept.getSensor().getActualPin(), transExcept.getValue()));
         w(String.format("\t\twhile(1) { state_%s(); }", transExcept.getNext().getName()));
         w("\t}");
     }
@@ -143,7 +137,7 @@ public class ToWiring extends Visitor<StringBuffer> {
         String lcdName = monitor.getLcd().getName();
 
         if(sensor instanceof ThermoSensor) {
-            w(String.format("\tint a = analogRead(A%s);", sensor.getPin()));
+            w(String.format("\tint a = analogRead(%s);", sensor.getActualPin()));
             w("\tint B = 4275;");
             w("\tfloat R = 1023.0/((float)a)-1.0;");
             w("\tR = 100000.0*R;");
@@ -156,7 +150,7 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("\t%s.print((char) LCD_CHAR_CELSIUS);", lcdName));
         }
         else {
-            w(String.format("\tint value = digitalRead(%d);", sensor.getPin()));
+            w(String.format("\tint value = digitalRead(%s);", sensor.getActualPin()));
             w(String.format("\t%s.setCursor(13, 1);", lcdName));
             w(String.format("\t%s.print(value ? \" ON\" : \"OFF\");", lcdName));
         }

@@ -10,4 +10,7 @@ public abstract class Brick implements NamedElement, Visitable {
     private String name;
     private int pin;
 
+    public String getActualPin() {
+        return (pin < 6 ? "A" + pin : String.valueOf(pin));
+    }
 }
